@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>会員登録</title>
+</head>
+<body>
+    <h1>会員登録</h1>
+    <form method="post" action="{{ url_for('signup_view') }}">
+        <label for="username">ユーザー名:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        <label for="password">パスワード:</label>
+        <input type="password" id="password" name="password" required><br><br>
+        <input type="submit" value="登録">
+    </form>
+    <p>既にアカウントをお持ちの方は<a href="{{ url_for('login_view') }}">こちら</a>からログインできます。</p>
+</body>
+</html>
