@@ -19,12 +19,22 @@ CREATE TABLE users (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE hobby_genres (
+    hobby_genre_id VARCHAR(255) PRIMARY KEY,
+    hobby_genre_name VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+
 CREATE TABLE channels (
     channel_id VARCHAR(255) PRIMARY KEY,
     channel_name VARCHAR(255) NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     user_id  VARCHAR(255) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    hobby_genre_id VARCHAR(255) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (hobby_genre_id)
+    REFERENCES hobby_genres(hobby_genre_id)
 );
 
 CREATE TABLE messages (
@@ -37,30 +47,12 @@ CREATE TABLE messages (
     FOREIGN KEY (channel_id) REFERENCES channels(channel_id) ON DELETE CASCADE
 );
 
-CREATE TABLE hobby_genres (
-    hobby_genre_id VARCHAR(255) PRIMARY KEY,
-    hobby_genre_name VARCHAR(50) NOT NULL
-);
-
-
-
-
--- ALTER TABLE channels DROP FOREIGN KEY hobby_genre_id;
--- FOREIGN KEY (hobby_genre_id) REFERENCES hobby_genres (hobby_genre_id) 
--- ON DELETE SET NULL ON UPDATE CASCADE;
--- ALTER TABLE channels
--- ADD COLUMN hobby_genre_id VARCHAR(255) NOT NULL;
--- ALTER TABLE channels ADD CONSTRAINT hobby_genre_id
--- FOREIGN KEY (hobby_genre_id)
--- REFERENCES hobby_genres(hobby_genre_id);
 
 INSERT INTO users(user_id, email, password, nickname,  icon_image_url) VALUES('970af84c-dd40-47ff-af23-282b72b7cca8','test@gmail.com','password','testuser','37268335dd6931045bdcdf92623ff819a64244b53d0e746d438797349d4da578');
+INSERT INTO hobby_genres(hobby_genre_id, hobby_genre_name) VALUES('3b2f1a2a-5d6f-4a9f-bc3b-23429dfb21ac','スポーツ');
 
 
--- ALTER TABLE channels DROP FOREIGN KEY user_id;
--- FOREIGN KEY (user_id) REFERENCES users (user_id) 
--- ON DELETE SET NULL ON UPDATE CASCADE;
--- INSERT INTO channels(channel_id, channel_name, user_id) VALUES('1','サッカー','1');
+INSERT INTO channels(channel_id, channel_name, user_id, hobby_genre_id) VALUES('c8d1d11e-0f22-4e63-9039-9a8e10b24360','サッカー','970af84c-dd40-47ff-af23-282b72b7cca8',"3b2f1a2a-5d6f-4a9f-bc3b-23429dfb21ac");
 
--- INSERT INTO messages(message_id, message_content,  channel_id,  user_id) VALUES('1','こんにちは！','1','1');
+INSERT INTO messages(message_id, message_content,  channel_id,  user_id) VALUES('91f3f5ab-4bce-4c77-8de7-2b215f6fd1a6','こんにちは！','c8d1d11e-0f22-4e63-9039-9a8e10b24360','970af84c-dd40-47ff-af23-282b72b7cca8');
 
