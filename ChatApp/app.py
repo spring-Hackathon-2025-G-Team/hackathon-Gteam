@@ -88,8 +88,36 @@ def logout():
     session.pop('user', None)
     return redirect(url_for('login_view'))
 
+#パスワード再設定画面
+@app.route('/password_reset', methods=['GET'])
+def password_reset_view():
+    return render_template('password_reset.html')
 
+#パスワード再設定
+@app.route('/password_reset', methods=['POST'])
+def password_reset_process():
+    email = request.form.get('email')
+    new_password = request.form.get('new_password')
+    new_password_second = request.form.get('new_password_second')
+
+    if email == '' or new_password == '':
+        flash('空欄を埋めてください')
+    elif new_password != new_password_second:
+        flash('パスワードが一致しません')
+    elif re.match(EMAIL_PATTERN, email) is None:
+        flash('正しいメールアドレスの形式で入力してください')
+    else:
+        user = User.find_by_email(email)
+        if user is None:
+            flash('このメールアドレスは登録されていません')
+        else:
+            new_hashPassword = hashlib.sha256(new_password.encode('utf-8')).hexdigest()
+            User.update_password(user['uid'], new_hashPassword)
+            flash('パスワードをリセットしました。ログインしてください')
+            return redirect(url_for('login_view'))
+
+    return redirect(url_for('password_reset_view'))
 
 if __name__ == '__main__':
     print("Starting Flask application...")
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', debug=True)
