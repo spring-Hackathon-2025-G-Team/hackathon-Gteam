@@ -14,7 +14,7 @@
       {% endif %}
     {% endwith %}
     <h1>ルーム作成</h1>
-    <form method="post" action="{{ url_for('signup') }}">
+    <form method="post" action="{{ url_for('room_create') }}">
         <label for="text">ルーム名</label>
         <input type="text" id="channel_name" name="channel_name" ><br><br>
         <select name="hobby_genre_name" size="5">
@@ -35,6 +35,7 @@
             <option value="eat">飲食</option>
             <option value="another">その他</option>
             </select>
+            <br><br><br>
         <label for="text">コメント</label>
         <input type="text" id="comment" name="comment" ><br><br>
         <button>作成</button>
