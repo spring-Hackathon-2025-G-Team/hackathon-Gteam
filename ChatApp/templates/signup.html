@@ -1,31 +1,43 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>新規登録</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block title %}signup{% endblock %}
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <img class="flower left", src="{{ url_for('static', filename='image/flower_left.jpg') }}">
+  <div class="signup-wrapper">
+    <h1>偏愛会議</h1>
+    <h2>新規登録</h2>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <ul class="flashes">
+        <div class="flashes">
           {% for message in messages %}
-            <li>{{ message }}</li>
+            <p>{{ message }}</p>
           {% endfor %}
-        </ul>
+        </div>
       {% endif %}
     {% endwith %}
-    <h1>新規登録</h1>
-    <form method="post" action="{{ url_for('signup') }}">
-        <label for="email">Email:</label>
-        <input type="text" id="email" name="email" ><br><br>
-        <label for="password">パスワード:</label>
-        <input type="password" id="password" name="password" ><br><br>
-        <label for="password">パスワード:</label>
-        <input type="password" id="password_second" name="password_second" required><br><br>
-        <label for="text">ニックネーム</label>
-        <input type="text" id="nickname" name="nickname" ><br><br>
-        <label for="text">icon</label>
-        <input type="file" id="icon" name="icon" ><br><br>
-        <input type="submit" value="登録">
+    <form class="form-signup" method="post" action="{{ url_for('signup') }}">
+      <div>
+        <input placeholder="メールアドレス" type="text" id="email" name="email" required/>
+      </div>
+      <div>
+        <input placeholder="パスワード" type="password" id="password" name="password" required/>
+      </div>
+      <div>
+        <input placeholder="パスワード(確認用)" type="password" id="password_second" name="password_second" required/>
+      </div>
+      <div>
+        <input placeholder="ニックネーム" type="text" id="nickname" name="nickname" required/>
+      </div>
+      <div>
+        <button class="signup-button" type="submit">登録</button>
+      </div>
     </form>
-    <p>既にアカウントをお持ちの方は<a href="{{ url_for('login_view') }}">こちら</a>からログインできます。</p>
-</body>
+    <a class="switch-login-button" href="{{ url_for('login_view') }}">ログインはこちら</a>
+  </div>
+  <img class="flower right", src="{{ url_for('static', filename='image/flower_right.jpg') }}">
+</div>
+{% endblock %}
