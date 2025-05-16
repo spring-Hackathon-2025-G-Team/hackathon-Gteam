@@ -5,9 +5,15 @@
 </head>
 <body>
     <h1>ログイン</h1>
-    {% if error %}
-    <p style="color:red;">{{ error }}</p>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class="flashes">
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
     {% endif %}
+  {% endwith %}
     <form method="post" action="{{ url_for('login_view') }}">
         <label for="email">Email:</label>
         <input type="text" id="email" name="email" required><br><br>
