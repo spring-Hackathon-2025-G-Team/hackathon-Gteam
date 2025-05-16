@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ルーム作成</title>
+</head>
+<body>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    <h1>ルーム作成</h1>
+    <form method="post" action="{{ url_for('room_create') }}">
+        <label for="text">ルーム名</label>
+        <input type="text" id="channel_name" name="channel_name" ><br><br>
+        <select name="hobby_genre_name" size="5">
+            <option value="travel">旅行</option>
+            <option value="study">学習</option>
+            <option value="movie">映画</option>
+            <option value="comic">漫画・アニメ・ゲーム</option>
+            <option value="music">音楽</option>
+            <option value="sauna">サウナ</option>
+            <option value="art">芸術</option>
+            <option value="musle">筋トレ</option>
+            <option value="sport">スポーツ</option>
+            <option value="pet">ペット</option>
+            <option value="idol">アイドル</option>
+            <option value="cosme">コスメ</option>
+            <option value="fashion">ファッション</option>
+            <option value="relax">リラックス</option>
+            <option value="eat">飲食</option>
+            <option value="another">その他</option>
+            </select>
+            <br><br><br>
+        <label for="text">コメント</label>
+        <input type="text" id="comment" name="comment" ><br><br>
+        <button>作成</button>
+    </form>
+    <br><br><br><br>
+    <a href="{{ url_for('logout') }}">ログアウト</a>
+
+
+</body>
+
