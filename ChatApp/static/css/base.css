@@ -1,0 +1,35 @@
+html, body {
+  font-family: 'Noto Sans JP', sans-serif; /* フォントの指定 */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  height: 100%;
+}
+
+h1 {
+  color: #912018;
+  margin: 0;
+  font-family: 'M PLUS Rounded 1c', sans-serif; /* フォントの指定 */
+  font-size: 6vw; /* 画面の横幅に応じて変化する */
+}
+
+h2 {
+  color: #912018;
+  margin: 0;
+  font-family: 'M PLUS Rounded 1c', sans-serif; /* フォントの種類 */
+  font-size: 3vw; /* 画面の横幅に応じて変化する */
+}
+
+input {
+  width: 24vw; /* ボタンの幅 */
+  padding: 0.5vw ; /* ボタンの高さ */
+  margin: 0.6vw; /* 要素の外側の余白 */
+  border-radius: 50px; /* ボタンの角丸 */
+  border: solid #FDA29B; /* 要素の枠線: 1本線 色指定 */
+  /* text-align: center; */
+}
+
+::placeholder {
+  color: #912018;
+  font-family: 'Noto Sans JP', sans-serif;
+}
