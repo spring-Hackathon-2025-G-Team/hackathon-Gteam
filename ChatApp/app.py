@@ -173,7 +173,6 @@ def room_create():
             channel_id = uuid.uuid4() 
             user_id = session["user_id"]
             hobby_id = Genre.find_by_genre_id(hobby_genre_name)
-            print=(hobby_genre_name)
             hobby_genre_id = hobby_id["hobby_genre_id"]
             Genre.create(channel_id, channel_name, user_id , hobby_genre_id)
             return redirect(url_for('room_create_view'))
