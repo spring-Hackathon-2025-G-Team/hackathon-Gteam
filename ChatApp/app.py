@@ -148,42 +148,76 @@ def password_reset_process():
 
 
 
-# #room作成画面
-# @app.route('/room-create', methods=['GET'])
-# def room_create_view():
-#     return render_template('room-create.html')
+#room作成画面
+@app.route('/room-create', methods=['GET'])
+def room_create_view():
+    return render_template('room-create.html')
 
 
-# # room作成
-# @app.route('/room-create', methods=['POST'])
-# def room_create():
-#     channel_name = request.form.get('channel_name')
-#     hobby_genre_name = request.form.get('hobby_genre_name')
-#     channel_comment = request.form.get('comment')
-#     if channel_name == '' or hobby_genre_name == '' :
-#         flash('空のフォームがあるようです')
-
-#     else:
-#        registered_channel_name = Genre.find_by_channel_name(hobby_genre_name)
-#        if registered_channel_name != None:
-#            flash('既に登録されているようです')
-#        else:
-#            if channel_comment == "":
-#             channel_id = uuid.uuid4() 
-#             user_id = session["user_id"]
-#             hobby_genre_id = Genre.find_by_genre_id(hobby_genre_name)
-#             Genre.create(channel_id, channel_name, user_id , hobby_genre_id)
-#             return redirect(url_for('room_create_view'))
-#            else:
-#             channel_id = uuid.uuid4() 
-#             user_id = session["user_id"]
-#             hobby_genre_id = Genre.find_by_genre_id(hobby_genre_name)
-#             Genre.create_comment(channel_id, channel_name,user_id , hobby_genre_id, channel_comment)
-#             return redirect(url_for('room_create_view'))
+# room作成
+@app.route('/room-create', methods=['POST'])
+def room_create():
+    channel_name = request.form.get('channel_name')
+    hobby_genre_name = request.form.get('hobby_genre_name')
+    channel_comment = request.form.get('comment')
+    if channel_name == '' or hobby_genre_name == None :
+        flash('空のフォームがあるようです')
+    elif len(channel_comment)>50:
+        flash('コメントは50文字以内にしてください。')
+    else:
+       registered_channel_name = Genre.find_by_channel_name(channel_name)
+       if registered_channel_name != None:
+           flash('既に登録されているようです')
+       else:
+           if channel_comment == "":
+            channel_id = uuid.uuid4() 
+            user_id = session["user_id"]
+            hobby_id = Genre.find_by_genre_id(hobby_genre_name)
+            hobby_genre_id = hobby_id["hobby_genre_id"]
+            Genre.create(channel_id, channel_name, user_id , hobby_genre_id)
+            return redirect(url_for('room_create_view'))
+           else:
+            channel_id = uuid.uuid4() 
+            user_id = session["user_id"]
+            hobby_id = Genre.find_by_genre_id(hobby_genre_name)
+            print(hobby_id)
+            hobby_genre_id = hobby_id["hobby_genre_id"]
+            Genre.create_comment(channel_id, channel_name, channel_comment, user_id , hobby_genre_id)
+            return redirect(url_for('room_create_view'))
                
-#     return redirect(url_for(''))
+    return redirect(url_for('room_create'))
 
 
+# #ルーム検索画面表示
+# @app.route('/room-search', methods=['GET'])
+# def room_searcch_view():
+#     return render_template('room-search.html')
+
+
+# #ルーム検索
+# @app.route('/room-search', methods=['POST'])
+# def room_search():
+#     search_name = request.form.get('sear_chname')
+#     search_genre_name = request.form.get('search-genre_name')
+
+#     if search_name == '' and search_genre_name == '':
+#         flash('どちらか入力してください。')
+#     elif search_genre_name != '':
+#         user = User.find_by_email(email)
+#         if user is None:
+#             flash('このユーザーは存在しません')
+#         else:
+#             hashPassword = hashlib.sha256(password.encode('utf-8')).hexdigest()
+#             if hashPassword != user['password']:
+#                 flash('パスワードが間違っています')
+#             else:
+#                 user_id = user['user_id']
+#                 login_user(Login(user_id))
+#                 session["user_id"] = user_id
+                
+#                 return redirect(url_for('index'))
+    
+#     return redirect(url_for('login_view'))
 
 
 if __name__ == '__main__':
