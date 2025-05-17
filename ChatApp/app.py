@@ -162,7 +162,8 @@ def room_create():
     channel_comment = request.form.get('comment')
     if channel_name == '' or hobby_genre_name == None :
         flash('空のフォームがあるようです')
-
+    elif len(channel_comment)>50:
+        flash('コメントは50文字以内にしてください。')
     else:
        registered_channel_name = Genre.find_by_channel_name(channel_name)
        if registered_channel_name != None:
@@ -172,6 +173,7 @@ def room_create():
             channel_id = uuid.uuid4() 
             user_id = session["user_id"]
             hobby_id = Genre.find_by_genre_id(hobby_genre_name)
+            print=(hobby_genre_name)
             hobby_genre_id = hobby_id["hobby_genre_id"]
             Genre.create(channel_id, channel_name, user_id , hobby_genre_id)
             return redirect(url_for('room_create_view'))
