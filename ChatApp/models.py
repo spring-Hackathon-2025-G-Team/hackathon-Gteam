@@ -1,3 +1,4 @@
+from flask import abort
 import pymysql
 from flask_login import UserMixin, LoginManager
 from util.DB import DB
@@ -80,8 +81,23 @@ class Genre:
                 conn.commit()
           finally:
               db_use.release(conn)
-               
-    
+
+    # チャットルームの全取得
+    @classmethod
+    def get_all(cls):
+        conn = db_use.get_conn()
+        try:
+            with conn.cursor() as cur:
+                sql = "SELECT * FROM channels ORDER BY created_at DESC;"
+                cur.execute(sql)
+                channels_list = cur.fetchall()
+                return channels_list
+        except pymysql.Error as e:
+            print(f'エラーが発生しています:{e}')
+            abort(500)
+        finally:
+            db_use.release(conn)
+
 
 # sql = "SELECT user_id FROM user WHERE username = ?"
 #     cursor.execute(sql, (username,))

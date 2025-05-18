@@ -146,7 +146,15 @@ def password_reset_process():
 
     return redirect(url_for('password_reset_view'))
 
-
+# チャットルーム一覧画面表示
+@app.route('/chatroom_list', methods=['GET'])
+def channels_view():
+    uid = session.get('uid')
+    if uid is None:
+        return redirect(url_for('login_view'))
+    else:
+        channels_list = Genre.get_all()
+        return render_template('channels_list.html', channels_list=channels_list, uid=uid)
 
 #room作成画面
 @app.route('/room-create', methods=['GET'])
