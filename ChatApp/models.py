@@ -58,53 +58,59 @@ class Login(UserMixin):
 
    
 
-# class Genre:
-#      @classmethod
-#      def create(cls, channel_id, channel_name, user_id , hobby_genre_id):
-#           conn = db_use.get_conn()
-#           try:
-#             with conn.cursor() as cursor:
-#                 sql = "INSERT INTO channels (channel_id, channel_name, user_id , hobby_genre_id) VALUES (%s, %s, %s, %s)"
-#                 cursor.execute(sql, (user_id, channel_id, channel_name, user_id , hobby_genre_id))
-#                 conn.commit()
-#           finally:
-#               db_use.release(conn)
+class Genre:
+     @classmethod
+     def create(cls, channel_id, channel_name, user_id , hobby_genre_id):
+          conn = db_use.get_conn()
+          try:
+            with conn.cursor() as cursor:
+                sql = "INSERT INTO channels (channel_id, channel_name, user_id , hobby_genre_id) VALUES (%s, %s, %s, %s)"
+                cursor.execute(sql, (user_id, channel_id, channel_name, user_id , hobby_genre_id))
+                conn.commit()
+          finally:
+              db_use.release(conn)
                
-#      @classmethod
-#      def create_comment(cls, channel_id, channel_name,user_id , hobby_genre_id, channel_comment):
-#           conn = db_use.get_conn()
-#           try:
-#             with conn.cursor() as cursor:
-#                 sql = "INSERT INTO channels (channel_id, channel_name,user_id , hobby_genre_id, channel_comment) VALUES (%s, %s, %s, %s, %s)"
-#                 cursor.execute(sql, (channel_id, channel_name,user_id , hobby_genre_id,channel_comment))
-#                 conn.commit()
-#           finally:
-#               db_use.release(conn)
+     @classmethod
+     def create_comment(cls, channel_id, channel_name, channel_comment, user_id , hobby_genre_id):
+          conn = db_use.get_conn()
+          try:
+            with conn.cursor() as cursor:
+                sql = "INSERT INTO channels (channel_id, channel_name, channel_comment, user_id , hobby_genre_id) VALUES (%s, %s, %s, %s, %s)"
+                cursor.execute(sql, (channel_id, channel_name, channel_comment, user_id , hobby_genre_id))
+                conn.commit()
+          finally:
+              db_use.release(conn)
                
-                    
-#      @classmethod
-#      def find_by_genre_id(cls,genrename):
-#         #   hobby_genre_name
-#           print(genrename)
-#           conn = db_use.get_conn()
-#           try:
-#             with conn.cursor() as cursor:
-#                 sql = "SELECT hobby_genre_id FROM genre WHERE hobby_genre_name = ? "
-#                 cursor.execute(sql, (hobby_genre_id,))
-#                 hobby_genre_id = cursor.fetchone()
-#                 return hobby_genre_id
-#           finally:
-#                 db_use.release(conn)
+    
 
-#      @classmethod
-#      def find_by_channel_name(cls, channel_name):
-#           conn = db_use.get_conn()
-#           try:
-#             with conn.cursor() as cursor:
-#                 sql = "SELECT * FROM channels WHERE channel_name=%s"
-#                 cursor.execute(sql, (channel_name,))
-#                 channel_name = cursor.fetchone()
-#                 return channel_name
-#           finally:
-#                 db_use.release(conn)
+# sql = "SELECT user_id FROM user WHERE username = ?"
+#     cursor.execute(sql, (username,))
+
+     def name():
+        return ""
+    
+     @classmethod
+     def find_by_genre_id(cls,genrename):
+          conn = db_use.get_conn()
+          try:
+            with conn.cursor() as cursor:
+                sql = "SELECT hobby_genre_id FROM hobby_genres WHERE hobby_genre_name = %s"
+                cursor.execute(sql, (genrename,))
+                hobby_genre_id = cursor.fetchone()
+                print(hobby_genre_id)
+                return hobby_genre_id
+          finally:
+                db_use.release(conn)
+
+     @classmethod
+     def find_by_channel_name(cls, channel_name):
+          conn = db_use.get_conn()
+          try:
+            with conn.cursor() as cursor:
+                sql = "SELECT * FROM channels WHERE channel_name=%s"
+                cursor.execute(sql, (channel_name,))
+                channel_name = cursor.fetchone()
+                return channel_name
+          finally:
+                db_use.release(conn)
 
