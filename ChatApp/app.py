@@ -6,7 +6,7 @@ import re
 import os
 from flask_login import login_user, logout_user, login_required, LoginManager
 
-from models import User, Login, Genre
+from models import User, Login # Genre ジャンル検索をコメントアウトする時に一緒に解除して下さい
 
 
 
@@ -26,19 +26,12 @@ login_manager.login_view = 'login_view'
 login_manager.login_message = "ログインが必要です。先にログインしてください。"
 @login_manager.user_loader
 def load_user(user_id):
-          return  Login(user_id)
+    return  Login(user_id)
 
 ##ログインしている時だけは入れるページにはこれを書いてください--->@login_required
 
 
 
-
-
-
-@app.route('/index', methods=['GET', 'POST'])
-@login_required
-def index():
-    return render_template('index.html')
 
 
 # 新規登録画面の表示
@@ -48,7 +41,7 @@ def signup_view():
 
 # 新規登録
 @app.route('/signup', methods=['POST'])
-def signup():
+def signup_process():
     email = request.form.get('email')
     password = request.form.get('password')
     password_second = request.form.get('password_second')
@@ -70,8 +63,7 @@ def signup():
             UserId = str(user_id)
             session['user_id'] = UserId
             return redirect(url_for('login_view'))
-    return redirect(url_for('signup'))
-
+    return redirect(url_for('signup_view'))
 
 
 
@@ -100,18 +92,17 @@ def login_process():
             else:
                 user_id = user['user_id']
                 login_user(Login(user_id))
-                session["user_id"] = user_id
-                
-                return redirect(url_for('index'))
-    
+                session["user_id"] = user_id                
+                return redirect(url_for('index_view'))
     return redirect(url_for('login_view'))
+
 
 # ログアウト
 @app.route('/logout', methods=['GET'])
 @login_required
 def logout():
     logout_user()
-    session.pop('user', None)
+    session.pop('user_id', None)
     flash('ログアウトしました。')
     return redirect(url_for('login_view'))
 
@@ -140,52 +131,98 @@ def password_reset_process():
             flash('このメールアドレスは登録されていません')
         else:
             new_hashPassword = hashlib.sha256(new_password.encode('utf-8')).hexdigest()
-            User.update_password(user['uid'], new_hashPassword)
+            User.update_password(user['user_id'], new_hashPassword)
             flash('パスワードをリセットしました。ログインしてください')
             return redirect(url_for('login_view'))
 
     return redirect(url_for('password_reset_view'))
 
 
+# チャットルーム一覧の表示
+@app.route('/index', methods=['GET', 'POST'])
+@login_required
+def index_view():
+    return render_template('index.html')
+
 
 #room作成画面
-@app.route('/room-create', methods=['GET'])
+@app.route('/room_create', methods=['GET'])
+@login_required
 def room_create_view():
-    return render_template('room-create.html')
+    return render_template('room_create.html')
 
 
 # room作成
-@app.route('/room-create', methods=['POST'])
-def room_create():
-    channel_name = request.form.get('channel_name')
-    hobby_genre_name = request.form.get('hobby_genre_name')
-    channel_comment = request.form.get('comment')
-    if channel_name == '' or hobby_genre_name == None :
-        flash('空のフォームがあるようです')
-    elif len(channel_comment)>50:
-        flash('コメントは50文字以内にしてください。')
-    else:
-       registered_channel_name = Genre.find_by_channel_name(channel_name)
-       if registered_channel_name != None:
-           flash('既に登録されているようです')
-       else:
-           if channel_comment == "":
-            channel_id = uuid.uuid4() 
-            user_id = session["user_id"]
-            hobby_id = Genre.find_by_genre_id(hobby_genre_name)
-            hobby_genre_id = hobby_id["hobby_genre_id"]
-            Genre.create(channel_id, channel_name, user_id , hobby_genre_id)
-            return redirect(url_for('room_create_view'))
-           else:
-            channel_id = uuid.uuid4() 
-            user_id = session["user_id"]
-            hobby_id = Genre.find_by_genre_id(hobby_genre_name)
-            print(hobby_id)
-            hobby_genre_id = hobby_id["hobby_genre_id"]
-            Genre.create_comment(channel_id, channel_name, channel_comment, user_id , hobby_genre_id)
-            return redirect(url_for('room_create_view'))
-               
-    return redirect(url_for('room_create'))
+@app.route('/room_create', methods=['POST'])
+@login_required
+def room_create_process():
+    # channel_name = request.form.get('channel_name')
+    # hobby_genre_name = request.form.get('hobby_genre_name')
+    # channel_comment = request.form.get('comment')
+    # if channel_name == '' or hobby_genre_name == '' :
+    #     flash('空のフォームがあるようです')
+
+    # else:
+    #    registered_channel_name = Genre.find_by_channel_name(hobby_genre_name)
+    #    if registered_channel_name != None:
+    #        flash('既に登録されているようです')
+    #    else:
+    #        if channel_comment == "":
+    #         channel_id = uuid.uuid4() 
+    #         user_id = session["user_id"]
+    #         hobby_genre_id = Genre.find_by_genre_id(hobby_genre_name)
+    #         Genre.create(channel_id, channel_name, user_id , hobby_genre_id)
+    #         return redirect(url_for('room_create_view'))
+    #        else:
+    #         channel_id = uuid.uuid4() 
+    #         user_id = session["user_id"]
+    #         hobby_genre_id = Genre.find_by_genre_id(hobby_genre_name)
+    #         Genre.create_comment(channel_id, channel_name,user_id , hobby_genre_id, channel_comment)
+    return redirect(url_for('index_view'))
+    # return redirect(url_for('room_create'))
+
+
+# チャット画面の表示
+@app.route('/chatroom_screen/<int:room_id>')
+@login_required
+def chatroom_screen(room_id):
+    return render_template('chatroom_screen.html', room_id=room_id)
+
+
+# ジャンル検索画面の表示
+@app.route('/room_search')
+@login_required
+def room_search_view():
+    return render_template('room_search.html', channel_id=1)
+
+
+# ジャンル検索結果画面の表示
+@app.route('/room_search/result')
+@login_required
+def room_search_result():
+    genre = request.args.get('genre')
+    # ジャンル検索の処理
+    return render_template('room_search_result.html', genre=genre)
+
+
+# プロフィール画面の表示
+@app.route('/profile')
+@login_required
+def profile_view():
+    user_id = session.get("user_id")
+    return render_template('profile.html', user_id=user_id)
+
+
+# プロフィール編集画面の表示
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile_view():
+    user_id = session.get('user_id') 
+    if request.method == 'POST':
+        # 処理
+        return redirect(url_for('profile_view'))
+    return render_template('edit_profile.html', user_id=user_id)
+
 
 
 
