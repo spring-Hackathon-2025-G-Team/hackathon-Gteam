@@ -13,12 +13,11 @@
         </ul>
       {% endif %}
     {% endwith %}
-    <h1>ルーム作成</h1>
-    <form method="post" action="{{ url_for('room_serch') }}">
-        <label for="text">ルーム名、キーワードで検索</label>
-        <input type="text" id="serch_name" name="serch_name" ><br><br>
-        <p>ジャンルを選択してください</p>
-        <select name="serch_genre_name" size="5">
+    <h1>ルーム検索</h1>
+    <form method="post" action="{{ url_for('room_search') }}">
+        <p>検索したいジャンルを選択してください</p>
+        <select name="search_genre_name" size="5">
+            <option value="all">すべて</option>
             <option value="travel">旅行</option>
             <option value="study">学習</option>
             <option value="movie">映画</option>
@@ -40,6 +39,13 @@
         <button>検索</button>
     </form>
     <br><br><br><br>
+    <ul>
+  {% for channel in channels %}
+  <h2>ルームタイトル：{{ channel.channel_name }}</h2>
+  <p>コメント：{{ channel.channel_comment }}</p>
+  <small>作成日時:{{ channel.created_at }}</small>
+{% endfor %}
+</ul>
     <a href="{{ url_for('logout') }}">ログアウト</a>
 
 

@@ -6,7 +6,7 @@ import re
 import os
 from flask_login import login_user, logout_user, login_required, LoginManager
 
-from models import User, Login, Genre
+from models import User, Login, Genre, Search
 
 
 
@@ -187,6 +187,37 @@ def room_create():
                
     return redirect(url_for('room_create'))
 
+#ルーム検索画面表示
+@app.route('/room-search', methods=['GET'])
+def room_search_view():
+    return render_template('room-search.html')
+
+#ルーム検索画面
+@app.route('/room-search', methods=['POST'])
+def room_search():
+    search_genre_name= request.form.get('search_genre_name')
+    print(search_genre_name)
+    if  search_genre_name == None:
+        flash('ジャンルを選択してください')
+        return render_template('room-search.html')
+    elif search_genre_name == "all":
+        channels = Search.find_all()
+        if channels == ():
+            flash("該当するルームがまだありません")
+            return render_template('room-search.html')
+        else:
+            return render_template('room-search.html', channels = channels)
+
+    else:
+        channels = Search.find_by_search(search_genre_name)
+        if channels == ():
+            flash("該当するルームがまだありません")
+            return render_template('room-search.html')
+        else: 
+            return render_template('room-search.html', channels = channels)
+        
+    
+    
 
 
 
