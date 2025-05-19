@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}room_search{% endblock %}
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/room_search.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+  <div class="menu-container">
+    <h3>偏愛会議</h3>
+    <h4>メニュー</h4>
+    <a class="menu-button" href="{{ url_for('index_view') }}">ルーム一覧</a><br>
+    <a class="logout-button" href="{{ url_for('logout') }}">ログアウト</a>
+  </div>
+  <div class="room-container">
+    <h4>ジャンル検索</h4>
+    <form method="get" action="{{ url_for('room_search_result') }}">
+      <label for="genre">ジャンルを選択</label><br>
+      <select name="genre" required>
+        <option value="travel">旅行</option>
+        <option value="eat">飲食</option>
+        <option value="art">芸術</option>
+        <option value="study">学習</option>
+        <option value="movie">映画</option>
+        <option value="comic">漫画・アニメ・ゲーム</option>
+        <option value="music">音楽</option>
+        <option value="idol">アイドル</option>
+        <option value="musle">筋トレ</option>
+        <option value="sports">スポーツ</option>
+        <option value="sauna">サウナ</option>
+        <option value="relax">リラックス</option>
+        <option value="fashion">ファッション</option>
+        <option value="cosme">コスメ</option>
+        <option value="pet">ペット</option>
+        <option value="another">その他</option>
+      </select>
+      <button type="submit">検索</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
