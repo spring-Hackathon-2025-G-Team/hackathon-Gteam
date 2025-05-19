@@ -180,7 +180,6 @@ def room_create():
             channel_id = uuid.uuid4() 
             user_id = session["user_id"]
             hobby_id = Genre.find_by_genre_id(hobby_genre_name)
-            print(hobby_id)
             hobby_genre_id = hobby_id["hobby_genre_id"]
             Genre.create_comment(channel_id, channel_name, channel_comment, user_id , hobby_genre_id)
             return redirect(url_for('room_create_view'))
@@ -196,7 +195,6 @@ def room_search_view():
 @app.route('/room-search', methods=['POST'])
 def room_search():
     search_genre_name= request.form.get('search_genre_name')
-    print(search_genre_name)
     if  search_genre_name == None:
         flash('ジャンルを選択してください')
         return render_template('room-search.html')

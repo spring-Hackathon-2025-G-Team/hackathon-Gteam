@@ -109,13 +109,11 @@ class Genre:
 class Search:
      def search_id(self,name):
          conn = db_use.get_conn()
-         print(name)
          try:
             with conn.cursor() as cursor:
                 sql = "SELECT hobby_genre_id FROM hobby_genres WHERE hobby_genre_name =%s"
                 cursor.execute(sql, (name,))
                 channel_name = cursor.fetchone()
-                print(channel_name)
                 hobby_genre_name = channel_name["hobby_genre_id"]
                 conn.commit()
                 return hobby_genre_name
@@ -132,7 +130,6 @@ class Search:
                 cursor.execute(sql, (hobby_genre_name,))
                 channels =cursor.fetchall()
                 conn.commit()
-                print(channels)
                 return channels
           finally:
               db_use.release(conn)
@@ -146,7 +143,6 @@ class Search:
                 cursor.execute(sql)
                 channels = cursor.fetchall()
                 conn.commit()
-                print(channels)
                 return  channels
           finally:
               db_use.release(conn)
