@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}profile{% endblock %}
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+  <div class="menu-container">
+    <h3>偏愛会議</h3>
+    <h4>メニュー</h4>
+    <a class="menu-button" href="{{ url_for('edit_profile_view') }}">プロフィール編集</a><br>
+    <a class="menu-button" href="{{ url_for('index_view') }}">ルーム一覧</a><br>
+    <a class="logout-button" href="{{ url_for('logout') }}">ログアウト</a>
+  </div>
+  <div class="room-container">
+    <h4>プロフィール画面</h4>
+    <div>
+      <p>ここにプロフィールを表示する</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
