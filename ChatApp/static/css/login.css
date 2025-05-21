@@ -1,26 +1,23 @@
 html, body {
   background-color: #FDA29B; /* 背景色 */
-  margin: 0;
+  margin: 0;/* HTML要素の余白(デフォルト):カットする */
   padding: 0;
   box-sizing: border-box;
   height: 100%;
-  font-family: 'Noto Sans JP', sans-serif; /* フォントの指定 */
+  font-family: 'Noto Sans JP', sans-serif; /*フォントの指定 */
 }
 
 .container {
   background-color: #FEF3F2; /* 背景色 */
   display: flex;
-  justify-content: center; /* 要素の配置(左・中央・右):中央寄せ */
-  flex-direction: column; /* 要素の配置(縦横斜め): 縦並び */
+  justify-content: center;
+  flex-direction: column;
   text-align: center; /* 文字の配置(左・中央・右): 中央寄せ */
   align-items: center;
-  width: 100%;
-  max-width: 96vw;
+  width: 96vw;
   height: 100vh;
-  min-height: 100vh;
-  margin: 0 auto;
+  margin: auto;
   position: relative;
-  overflow: hidden; /* はみ出し防止 */
 }
 
 .flower {
@@ -39,7 +36,7 @@ html, body {
   right: 0%;
 }
 
-.form-signup {
+.form-login {
   margin: 0;
 }
 
@@ -50,19 +47,19 @@ html, body {
   font-family: 'Noto Sans JP', sans-serif; /* フォントの指定 */
 }
 
-.signup-button {
+.login-button {
   width: 25vw; /* ボタンの幅 */
   padding: 0.5vw ; /* ボタンの高さ */
   margin: 1vw;
   background-color: #D92D20;
   color: #FFFFFF;
-  border: none; /* 要素の枠線: なし */
+  border: none;
   border-radius: 50px; /* ボタンの角丸 */
   cursor: pointer; /* マウスポインターを登録ボタンに合わせると指差しアイコンに変わる */
 }
 
-.switch-login-button {
-  display: inline-block; /* aタグをbuttonタグと同じにする為、これで幅・高さが効くようになる */
+.switch-signup-button {
+  display: inline-block;
   width: 24vw; /* ボタンの幅 */
   padding: 0.4vw ; /* ボタンの高さ */
   margin: 0.6vw;
@@ -74,7 +71,7 @@ html, body {
   text-decoration: none; /* 文字の下線:なし */
 }
 
-/* レスポンシブ: 幅768以下になると、花が非表示になる */
+
 @media screen and (max-width: 768px) {
   .flower {
     display: none;

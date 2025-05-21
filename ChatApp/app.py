@@ -26,19 +26,12 @@ login_manager.login_view = 'login_view'
 login_manager.login_message = "ログインが必要です。先にログインしてください。"
 @login_manager.user_loader
 def load_user(user_id):
-          return  Login(user_id)
+    return  Login(user_id)
 
 ##ログインしている時だけは入れるページにはこれを書いてください--->@login_required
 
 
 
-
-
-
-@app.route('/index', methods=['GET', 'POST'])
-@login_required
-def index():
-    return render_template('index.html')
 
 
 # 新規登録画面の表示
@@ -48,7 +41,7 @@ def signup_view():
 
 # 新規登録
 @app.route('/signup', methods=['POST'])
-def signup():
+def signup_process():
     email = request.form.get('email')
     password = request.form.get('password')
     password_second = request.form.get('password_second')
@@ -70,8 +63,7 @@ def signup():
             UserId = str(user_id)
             session['user_id'] = UserId
             return redirect(url_for('login_view'))
-    return redirect(url_for('signup'))
-
+    return redirect(url_for('signup_view'))
 
 
 
@@ -100,18 +92,17 @@ def login_process():
             else:
                 user_id = user['user_id']
                 login_user(Login(user_id))
-                session["user_id"] = user_id
-                
-                return redirect(url_for('index'))
-    
+                session["user_id"] = user_id                
+                return redirect(url_for('index_view'))
     return redirect(url_for('login_view'))
+
 
 # ログアウト
 @app.route('/logout', methods=['GET'])
 @login_required
 def logout():
     logout_user()
-    session.pop('user', None)
+    session.pop('user_id', None)
     flash('ログアウトしました。')
     return redirect(url_for('login_view'))
 
@@ -140,82 +131,138 @@ def password_reset_process():
             flash('このメールアドレスは登録されていません')
         else:
             new_hashPassword = hashlib.sha256(new_password.encode('utf-8')).hexdigest()
-            User.update_password(user['uid'], new_hashPassword)
+            User.update_password(user['user_id'], new_hashPassword)
             flash('パスワードをリセットしました。ログインしてください')
             return redirect(url_for('login_view'))
 
     return redirect(url_for('password_reset_view'))
 
 
+# チャットルーム一覧の表示
+@app.route('/index', methods=['GET', 'POST'])
+@login_required
+def index_view():
+    return render_template('index.html')
+
 
 #room作成画面
-@app.route('/room-create', methods=['GET'])
+@app.route('/room_create', methods=['GET'])
+@login_required
 def room_create_view():
-    return render_template('room-create.html')
+    return render_template('room_create.html')
 
 
 # room作成
-@app.route('/room-create', methods=['POST'])
-def room_create():
+@app.route('/room_create', methods=['POST'])
+# @login_required
+def room_create_process():
     channel_name = request.form.get('channel_name')
     hobby_genre_name = request.form.get('hobby_genre_name')
     channel_comment = request.form.get('comment')
-    if channel_name == '' or hobby_genre_name == None :
+    if channel_name == '' or hobby_genre_name == '' :
         flash('空のフォームがあるようです')
-    elif len(channel_comment)>50:
-        flash('コメントは50文字以内にしてください。')
+
     else:
-       registered_channel_name = Genre.find_by_channel_name(channel_name)
+       registered_channel_name = Genre.find_by_channel_name(hobby_genre_name)
        if registered_channel_name != None:
            flash('既に登録されているようです')
        else:
            if channel_comment == "":
             channel_id = uuid.uuid4() 
             user_id = session["user_id"]
-            hobby_id = Genre.find_by_genre_id(hobby_genre_name)
-            hobby_genre_id = hobby_id["hobby_genre_id"]
+            hobby_genre_id = Genre.find_by_genre_id(hobby_genre_name)
             Genre.create(channel_id, channel_name, user_id , hobby_genre_id)
             return redirect(url_for('room_create_view'))
            else:
             channel_id = uuid.uuid4() 
             user_id = session["user_id"]
-            hobby_id = Genre.find_by_genre_id(hobby_genre_name)
-            hobby_genre_id = hobby_id["hobby_genre_id"]
+            genre_id_dic = Genre.find_by_genre_id(hobby_genre_name)
+            hobby_genre_id = genre_id_dic["hobby_genre_id"]
             Genre.create_comment(channel_id, channel_name, channel_comment, user_id , hobby_genre_id)
-            return redirect(url_for('room_create_view'))
-               
-    return redirect(url_for('room_create'))
+    return redirect(url_for('index_view'))
 
-#ルーム検索画面表示
-@app.route('/room-search', methods=['GET'])
+# チャット画面の表示
+@app.route('/chatroom_screen/<int:room_id>')
+@login_required
+def chatroom_screen(room_id):
+    return render_template('chatroom_screen.html', room_id=room_id)
+
+# ジャンル検索画面の表示
+@app.route('/room_search')
+@login_required
 def room_search_view():
-    return render_template('room-search.html')
+    return render_template('room_search.html')
 
-#ルーム検索画面
-@app.route('/room-search', methods=['POST'])
-def room_search():
+#ジャンル検索画面
+@app.route('/room_search', methods=['POST'])
+def room_search_process():
     search_genre_name= request.form.get('search_genre_name')
+    genre = {
+    "all": "すべて",
+    "travel": "旅行",
+    "eat": "飲食",
+    "art": "芸術",
+    "study": "学習",
+    "muvie": "映画",
+    "comic": "漫画・アニメ・ゲーム",
+    "music": "音楽",
+    "idol": "アイドル",
+    "muscle": "筋トレ",
+    "sports": "スポーツ",
+    "sauna": "サウナ",
+    "relax": "リラックス",
+    "fashion": "ファッション",
+    "cosme": "コスメ",
+    "pet": "ペット",
+    "another": "その他"
+}
+    genre = genre[search_genre_name]
     if  search_genre_name == None:
         flash('ジャンルを選択してください')
-        return render_template('room-search.html')
+        return render_template('room_search.html')
     elif search_genre_name == "all":
         channels = Search.find_all()
         if channels == ():
             flash("該当するルームがまだありません")
-            return render_template('room-search.html')
+            return render_template('room_search.html')
         else:
-            return render_template('room-search.html', channels = channels)
+            return render_template('room_search_result.html', channels = channels, genre =genre , content_type='text/html; charset=utf-8')
 
     else:
         channels = Search.find_by_search(search_genre_name)
         if channels == ():
             flash("該当するルームがまだありません")
-            return render_template('room-search.html')
+            return render_template('room_search.html')
         else: 
-            return render_template('room-search.html', channels = channels)
-        
-    
-    
+            return render_template('room_search_result.html', channels = channels, genre = genre , content_type='text/html; charset=utf-8')
+
+# ジャンル検索結果画面の表示
+@app.route('/room_search_result', methods=['GET'])
+def room_search_result():
+    genre = request.args.get('genre')
+    # ジャンル検索の処理
+    return render_template('room_search_result.html', genre=genre)
+
+
+# プロフィール画面の表示
+@app.route('/profile')
+@login_required
+def profile_view():
+    user_id = session.get("user_id")
+    return render_template('profile.html', user_id=user_id)
+
+
+# プロフィール編集画面の表示
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile_view():
+    user_id = session.get('user_id') 
+    if request.method == 'POST':
+        # 処理
+        return redirect(url_for('profile_view'))
+    return render_template('edit_profile.html', user_id=user_id)
+
+
 
 
 

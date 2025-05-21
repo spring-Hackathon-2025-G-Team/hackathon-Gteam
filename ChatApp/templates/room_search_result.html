@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}room_search_result{% endblock %}
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/room_search_result.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+  <div class="menu-container">
+    <h3>偏愛会議</h3>
+    <h4>メニュー</h4>
+    <a class="menu-button" href="{{ url_for('room_search_view') }}">ジャンル検索</a><br>
+    <a class="menu-button" href="{{ url_for('index_view') }}">ルーム一覧</a><br>
+    <a class="logout-button" href="{{ url_for('logout') }}">ログアウト</a>
+  </div>
+  <div class="room-container">
+    <h4>{{ genre }} ジャンルの検索結果</h4>
+      {% for channel in channels %}
+  <h2>ルームタイトル：{{ channel.channel_name }}</h2>
+  {% if  channel.channel_comment is not none %}
+  <p>コメント：{{ channel.channel_comment }}</p>
+  {% endif %}
+  <small>作成日時:{{ channel.created_at }}</small>
+{% endfor %}
+  </div>
+</div>
+
+{% endblock %}

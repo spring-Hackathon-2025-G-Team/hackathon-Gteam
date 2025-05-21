@@ -6,6 +6,7 @@ CREATE USER 'testuser' IDENTIFIED BY 'testuser';
 CREATE DATABASE chatapp;
 USE chatapp;
 GRANT ALL PRIVILEGES ON chatapp.* TO 'testuser';
+SET NAMES utf8mb4;
 
 
 
@@ -17,13 +18,13 @@ CREATE TABLE users (
     nickname VARCHAR(50) NOT NULL,
     icon_image_url VARCHAR(255) DEFAULT '/static/image/icon' NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
+)CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE hobby_genres (
     hobby_genre_id VARCHAR(255) PRIMARY KEY,
     hobby_genre_name VARCHAR(50) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
+)CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 CREATE TABLE channels (
@@ -36,7 +37,7 @@ CREATE TABLE channels (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (hobby_genre_id)
     REFERENCES hobby_genres(hobby_genre_id)
-);
+)CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE messages (
     message_id VARCHAR(255) PRIMARY KEY,
@@ -46,10 +47,10 @@ CREATE TABLE messages (
     user_id  VARCHAR(255) NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (channel_id) REFERENCES channels(channel_id) ON DELETE CASCADE
-);
+)CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
-INSERT INTO users(user_id, email, password, nickname,  icon_image_url) VALUES('970af84c-dd40-47ff-af23-282b72b7cca8','test@gmail.com','password','testuser','37268335dd6931045bdcdf92623ff819a64244b53d0e746d438797349d4da578');
+INSERT INTO users(user_id, email, password, nickname,  icon_image_url) VALUES('970af84c-dd40-47ff-af23-282b72b7cca8','test@gmail.com','5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8','testuser','37268335dd6931045bdcdf92623ff819a64244b53d0e746d438797349d4da578');
 
 
 INSERT INTO hobby_genres(hobby_genre_id, hobby_genre_name) VALUES('550e8400-e29b-41d4-a716-446655440000','travel');
@@ -70,7 +71,6 @@ INSERT INTO hobby_genres(hobby_genre_id, hobby_genre_name) VALUES('3bbcee75-cecc
 INSERT INTO hobby_genres(hobby_genre_id, hobby_genre_name) VALUES('21ec2020-3aea-4069-a2dd-08002b30309d','another');
 
 
-INSERT INTO channels(channel_id, channel_name, user_id, hobby_genre_id) VALUES('c8d1d11e-0f22-4e63-9039-9a8e10b24360','サッカー','970af84c-dd40-47ff-af23-282b72b7cca8',"b81d2b87-78b5-4b37-8c5c-1e26c3b0c276");
+INSERT INTO channels(channel_id, channel_name, user_id, hobby_genre_id) VALUES('c8d1d11e-0f22-4e63-9039-9a8e10b24360','サッカー','970af84c-dd40-47ff-af23-282b72b7cca8','b81d2b87-78b5-4b37-8c5c-1e26c3b0c276');
 
 INSERT INTO messages(message_id, message_content,  channel_id,  user_id) VALUES('91f3f5ab-4bce-4c77-8de7-2b215f6fd1a6','こんにちは！','c8d1d11e-0f22-4e63-9039-9a8e10b24360','970af84c-dd40-47ff-af23-282b72b7cca8');
-

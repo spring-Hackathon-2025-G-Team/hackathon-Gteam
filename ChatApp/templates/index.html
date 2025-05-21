@@ -1,18 +1,23 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>ホーム</title>
-</head>
-<body>
-    <h1>Welcome to our website!</h1>
-    <p>ここにホーム画面のコンテンツを記述します。</p>
-    <a href="{{ url_for('login_view') }}">ログイン</a>
-    <a href="{{ url_for('signup') }}">会員登録</a>
+{% extends 'base.html' %}
+{% block title %}index{% endblock %}
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
 
-
-
-
-
-    <a href="{{ url_for('logout') }}">ログアウト</a>
-</body>
-</html>
+{% block content %}
+<div class="wrapper">
+  <div class="menu-container">
+    <h3>偏愛会議</h3>
+    <h4>メニュー</h4>
+    <a class="menu-button" href="{{ url_for('room_create_view') }}">ルーム作成</a><br>
+    <a class="menu-button" href="{{ url_for('room_search_view') }}">ジャンル検索</a><br>
+    <a class="menu-button" href="{{ url_for('profile_view') }}">プロフィール</a><br>
+    <a class="logout-button" href="{{ url_for('logout') }}">ログアウト</a>
+  </div>
+  <div class="room-container">
+<!-- ここにチャットルームを表示する -->
+    <h4>ルーム一覧</h4>
+    <a href="{{ url_for('chatroom_screen', room_id=1) }}">チャットルーム1</a><br>
+  </div>
+</div>
+{% endblock %}

@@ -65,7 +65,7 @@ class Genre:
           try:
             with conn.cursor() as cursor:
                 sql = "INSERT INTO channels (channel_id, channel_name, user_id , hobby_genre_id) VALUES (%s, %s, %s, %s)"
-                cursor.execute(sql, (user_id, channel_id, channel_name, user_id , hobby_genre_id))
+                cursor.execute(sql, (channel_id, channel_name, user_id , hobby_genre_id))
                 conn.commit()
           finally:
               db_use.release(conn)

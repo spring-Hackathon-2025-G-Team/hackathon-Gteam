@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}chatroom-screen{% endblock %}
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chatroom_screen.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+  <div class="menu-container">
+    <h3>偏愛会議</h3>
+    <h4>メニュー</h4>
+    <a class="menu-button" href="{{ url_for('index_view') }}">ルーム一覧</a><br>
+    <a class="logout-button" href="{{ url_for('logout') }}">ログアウト</a>
+  </div>
+  <div class="room-container">
+    <h4>チャットルーム</h4>
+    <div class="room-container">
+      <!-- ここにチャット画面のやり取りを表示させる -->
+    </div>
+  </div>
+</div>
+{% endblock %}
