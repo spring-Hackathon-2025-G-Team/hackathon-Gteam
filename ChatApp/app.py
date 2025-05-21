@@ -170,7 +170,8 @@ def room_create_process():
            if channel_comment == "":
             channel_id = uuid.uuid4() 
             user_id = session["user_id"]
-            hobby_genre_id = Genre.find_by_genre_id(hobby_genre_name)
+            genre_id_dic = Genre.find_by_genre_id(hobby_genre_name)
+            hobby_genre_id = genre_id_dic["hobby_genre_id"]
             Genre.create(channel_id, channel_name, user_id , hobby_genre_id)
             return redirect(url_for('room_create_view'))
            else:
@@ -204,7 +205,7 @@ def room_search_process():
     "eat": "飲食",
     "art": "芸術",
     "study": "学習",
-    "muvie": "映画",
+    "movie": "映画",
     "comic": "漫画・アニメ・ゲーム",
     "music": "音楽",
     "idol": "アイドル",

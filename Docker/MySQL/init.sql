@@ -61,7 +61,7 @@ INSERT INTO hobby_genres(hobby_genre_id, hobby_genre_name) VALUES('9b1deb4d-b5a2
 INSERT INTO hobby_genres(hobby_genre_id, hobby_genre_name) VALUES('7c9e6679-7425-40de-944b-e07fc1f90ae7','sauna');
 INSERT INTO hobby_genres(hobby_genre_id, hobby_genre_name) VALUES('123e4567-e89b-12d3-a456-426614174000','art');
 INSERT INTO hobby_genres(hobby_genre_id, hobby_genre_name) VALUES('3fa85f64-5717-4562-b3fc-2c963f66afa6','muscle');
-INSERT INTO hobby_genres(hobby_genre_id, hobby_genre_name) VALUES('b81d2b87-78b5-4b37-8c5c-1e26c3b0c276','sport');
+INSERT INTO hobby_genres(hobby_genre_id, hobby_genre_name) VALUES('b81d2b87-78b5-4b37-8c5c-1e26c3b0c276','sports');
 INSERT INTO hobby_genres(hobby_genre_id, hobby_genre_name) VALUES('e3e70682-c209-4cac-629f-6fbed82c07cd','pet');
 INSERT INTO hobby_genres(hobby_genre_id, hobby_genre_name) VALUES('5f47ac00-b7cd-4d4d-bdfd-fc09b5f97878','idol');
 INSERT INTO hobby_genres(hobby_genre_id, hobby_genre_name) VALUES('a987fbc9-4bed-4078-9f07-9141ba07c9f3','cosme');
