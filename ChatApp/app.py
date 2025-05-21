@@ -154,7 +154,7 @@ def room_create_view():
 
 # room作成
 @app.route('/room_create', methods=['POST'])
-# @login_required
+@login_required
 def room_create_process():
     channel_name = request.form.get('channel_name')
     hobby_genre_name = request.form.get('hobby_genre_name')
@@ -195,6 +195,7 @@ def room_search_view():
 
 #ジャンル検索画面
 @app.route('/room_search', methods=['POST'])
+@login_required
 def room_search_process():
     search_genre_name= request.form.get('search_genre_name')
     genre = {
@@ -238,6 +239,7 @@ def room_search_process():
 
 # ジャンル検索結果画面の表示
 @app.route('/room_search_result', methods=['GET'])
+@login_required
 def room_search_result():
     genre = request.args.get('genre')
     # ジャンル検索の処理
