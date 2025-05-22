@@ -76,7 +76,7 @@ class Genre:
           try:
             with conn.cursor() as cursor:
                 sql = "INSERT INTO channels (channel_id, channel_name, user_id , hobby_genre_id) VALUES (%s, %s, %s, %s)"
-                cursor.execute(sql, (user_id, channel_id, channel_name, user_id , hobby_genre_id))
+                cursor.execute(sql, (channel_id, channel_name, user_id , hobby_genre_id))
                 conn.commit()
           finally:
               db_use.release(conn)
@@ -93,13 +93,6 @@ class Genre:
               db_use.release(conn)
                
     
-
-# sql = "SELECT user_id FROM user WHERE username = ?"
-#     cursor.execute(sql, (username,))
-
-     def name():
-        return ""
-    
      @classmethod
      def find_by_genre_id(cls,genrename):
           conn = db_use.get_conn()
@@ -108,7 +101,6 @@ class Genre:
                 sql = "SELECT hobby_genre_id FROM hobby_genres WHERE hobby_genre_name = %s"
                 cursor.execute(sql, (genrename,))
                 hobby_genre_id = cursor.fetchone()
-                print(hobby_genre_id)
                 return hobby_genre_id
           finally:
                 db_use.release(conn)
@@ -125,3 +117,43 @@ class Genre:
           finally:
                 db_use.release(conn)
 
+class Search:
+     def search_id(self,name):
+         conn = db_use.get_conn()
+         try:
+            with conn.cursor() as cursor:
+                sql = "SELECT hobby_genre_id FROM hobby_genres WHERE hobby_genre_name =%s"
+                cursor.execute(sql, (name,))
+                channel_name = cursor.fetchone()
+                hobby_genre_name = channel_name["hobby_genre_id"]
+                conn.commit()
+                return hobby_genre_name
+         finally:
+              db_use.release(conn)
+
+     @classmethod
+     def find_by_search(self, search_genre_name):
+          hobby_genre_name = self.search_id(self, search_genre_name)
+          conn = db_use.get_conn()
+          try:
+            with conn.cursor() as cursor:
+                sql = "SELECT * FROM channels WHERE hobby_genre_id=%s"
+                cursor.execute(sql, (hobby_genre_name,))
+                channels =cursor.fetchall()
+                conn.commit()
+                return channels
+          finally:
+              db_use.release(conn)
+
+     @classmethod
+     def find_all(cls):
+          conn = db_use.get_conn()
+          try:
+            with conn.cursor() as cursor:
+                sql = "SELECT * FROM channels"
+                cursor.execute(sql)
+                channels = cursor.fetchall()
+                conn.commit()
+                return  channels
+          finally:
+              db_use.release(conn)
