@@ -17,7 +17,18 @@
   <div class="room-container">
 <!-- ここにチャットルームを表示する -->
     <h4>ルーム一覧</h4>
-    <a href="{{ url_for('chatroom_screen', room_id=1) }}">チャットルーム1</a><br>
-  </div>
-</div>
+    {% if channels %}
+    <ul>
+      {% for channel in channels %}
+      <li>
+        <a href="{{ url_for('chatroom_screen', channel_id=channel.channel_id) }}">
+          {{ channel.channel_name }}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>チャンネルが存在しません</p>
+    {% endif %}
+
 {% endblock %}

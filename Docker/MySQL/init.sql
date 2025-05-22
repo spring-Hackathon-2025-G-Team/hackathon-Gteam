@@ -17,7 +17,7 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     nickname VARCHAR(50) NOT NULL,
     icon_image_url VARCHAR(255) DEFAULT '/static/image/icon' NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 )CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE hobby_genres (
@@ -31,7 +31,7 @@ CREATE TABLE channels (
     channel_id VARCHAR(255) PRIMARY KEY,
     channel_name VARCHAR(255) NOT NULL,
     channel_comment VARCHAR(255)  NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     user_id  VARCHAR(255) NOT NULL,
     hobby_genre_id VARCHAR(255) NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
