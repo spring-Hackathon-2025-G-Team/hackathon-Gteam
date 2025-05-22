@@ -6,7 +6,7 @@ import re
 import os
 from flask_login import login_user, logout_user, login_required, LoginManager
 
-from models import User, Login # Genre ジャンル検索をコメントアウトする時に一緒に解除して下さい
+from models import User, Login, Genre, Search
 
 
 
@@ -156,31 +156,31 @@ def room_create_view():
 @app.route('/room_create', methods=['POST'])
 @login_required
 def room_create_process():
-    # channel_name = request.form.get('channel_name')
-    # hobby_genre_name = request.form.get('hobby_genre_name')
-    # channel_comment = request.form.get('comment')
-    # if channel_name == '' or hobby_genre_name == '' :
-    #     flash('空のフォームがあるようです')
+    channel_name = request.form.get('channel_name')
+    hobby_genre_name = request.form.get('hobby_genre_name')
+    channel_comment = request.form.get('comment')
+    if channel_name == '' or hobby_genre_name == '' :
+        flash('空のフォームがあるようです')
 
-    # else:
-    #    registered_channel_name = Genre.find_by_channel_name(hobby_genre_name)
-    #    if registered_channel_name != None:
-    #        flash('既に登録されているようです')
-    #    else:
-    #        if channel_comment == "":
-    #         channel_id = uuid.uuid4() 
-    #         user_id = session["user_id"]
-    #         hobby_genre_id = Genre.find_by_genre_id(hobby_genre_name)
-    #         Genre.create(channel_id, channel_name, user_id , hobby_genre_id)
-    #         return redirect(url_for('room_create_view'))
-    #        else:
-    #         channel_id = uuid.uuid4() 
-    #         user_id = session["user_id"]
-    #         hobby_genre_id = Genre.find_by_genre_id(hobby_genre_name)
-    #         Genre.create_comment(channel_id, channel_name,user_id , hobby_genre_id, channel_comment)
+    else:
+       registered_channel_name = Genre.find_by_channel_name(hobby_genre_name)
+       if registered_channel_name != None:
+           flash('既に登録されているようです')
+       else:
+           if channel_comment == "":
+            channel_id = uuid.uuid4() 
+            user_id = session["user_id"]
+            genre_id_dic = Genre.find_by_genre_id(hobby_genre_name)
+            hobby_genre_id = genre_id_dic["hobby_genre_id"]
+            Genre.create(channel_id, channel_name, user_id , hobby_genre_id)
+            return redirect(url_for('room_create_view'))
+           else:
+            channel_id = uuid.uuid4() 
+            user_id = session["user_id"]
+            genre_id_dic = Genre.find_by_genre_id(hobby_genre_name)
+            hobby_genre_id = genre_id_dic["hobby_genre_id"]
+            Genre.create_comment(channel_id, channel_name, channel_comment, user_id , hobby_genre_id)
     return redirect(url_for('index_view'))
-    # return redirect(url_for('room_create'))
-
 
 # チャット画面の表示
 @app.route('/chatroom_screen/<int:room_id>')
@@ -188,16 +188,58 @@ def room_create_process():
 def chatroom_screen(room_id):
     return render_template('chatroom_screen.html', room_id=room_id)
 
-
 # ジャンル検索画面の表示
 @app.route('/room_search')
 @login_required
 def room_search_view():
-    return render_template('room_search.html', channel_id=1)
+    return render_template('room_search.html')
 
+#ジャンル検索画面
+@app.route('/room_search', methods=['POST'])
+@login_required
+def room_search_process():
+    search_genre_name= request.form.get('search_genre_name')
+    genre = {
+    "all": "すべて",
+    "travel": "旅行",
+    "eat": "飲食",
+    "art": "芸術",
+    "study": "学習",
+    "movie": "映画",
+    "comic": "漫画・アニメ・ゲーム",
+    "music": "音楽",
+    "idol": "アイドル",
+    "muscle": "筋トレ",
+    "sports": "スポーツ",
+    "sauna": "サウナ",
+    "relax": "リラックス",
+    "fashion": "ファッション",
+    "cosme": "コスメ",
+    "pet": "ペット",
+    "another": "その他"
+}
+    genre = genre[search_genre_name]
+    if  search_genre_name == None:
+        flash('ジャンルを選択してください')
+        return render_template('room_search.html')
+    elif search_genre_name == "all":
+        channels = Search.find_all()
+        if channels == ():
+            flash("該当するルームがまだありません")
+            return render_template('room_search.html')
+        else:
+            return render_template('room_search_result.html', channels = channels, genre =genre , content_type='text/html; charset=utf-8')
+
+    else:
+        channels = Search.find_by_search(search_genre_name)
+        if channels == ():
+            flash("該当するルームがまだありません")
+            return render_template('room_search.html')
+        else: 
+            return render_template('room_search_result.html', channels = channels, genre = genre , content_type='text/html; charset=utf-8')
 
 # ジャンル検索結果画面の表示
-@app.route('/room_search/result')
+@app.route('/room_search_result', methods=['GET'])
 @login_required
 def room_search_result():
     genre = request.args.get('genre')

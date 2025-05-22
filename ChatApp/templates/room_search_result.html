@@ -15,7 +15,13 @@
   </div>
   <div class="room-container">
     <h4>{{ genre }} ジャンルの検索結果</h4>
-    <a>検索してヒットしたチャットルームをここに表示・遷移出来るようにする</a>
+      {% for channel in channels %}
+  <h2>ルームタイトル：{{ channel.channel_name }}</h2>
+  {% if  channel.channel_comment is not none %}
+  <p>コメント：{{ channel.channel_comment }}</p>
+  {% endif %}
+  <small>作成日時:{{ channel.created_at }}</small>
+{% endfor %}
   </div>
 </div>
 
