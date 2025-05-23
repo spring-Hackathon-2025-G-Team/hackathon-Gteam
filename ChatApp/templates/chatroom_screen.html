@@ -7,14 +7,22 @@
 {% block content %}
 <div class="wrapper">
   <div class="menu-container">
-    <h3>偏愛会議</h3>
-    <h4>メニュー</h4>
-    <a class="menu-button" href="{{ url_for('index_view') }}">ルーム一覧</a><br>
-    <a class="logout-button" href="{{ url_for('logout') }}">ログアウト</a>
+    <div class="menu-header">
+      <h3>偏愛会議</h3>
+    </div>
+    <div class="menu-buttons">
+      <h4>メニュー</h4>
+      <a class="menu-button" href="{{ url_for('index_view') }}"><i class="fas fa-home"></i> ルーム一覧</a><br>
+    </div>
+    <div class="menu-footer">
+      <a class="logout-button" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> ログアウト</a>
+    </div>
   </div>
   <div class="room-container">
-    <h4>チャットルーム</h4>
-    <div class="room-container">
+    <div class="room-header">
+      <h5>チャットルーム</h5>
+    </div>
+    <div class="room-main">
       <!-- ここにチャット画面のやり取りを表示させる -->
     </div>
   </div>

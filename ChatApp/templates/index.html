@@ -7,17 +7,41 @@
 {% block content %}
 <div class="wrapper">
   <div class="menu-container">
-    <h3>偏愛会議</h3>
-    <h4>メニュー</h4>
-    <a class="menu-button" href="{{ url_for('room_create_view') }}">ルーム作成</a><br>
-    <a class="menu-button" href="{{ url_for('room_search_view') }}">ジャンル検索</a><br>
-    <a class="menu-button" href="{{ url_for('profile_view') }}">プロフィール</a><br>
-    <a class="logout-button" href="{{ url_for('logout') }}">ログアウト</a>
+    <div class="menu-header">
+        <h3>偏愛会議</h3>
+    </div>
+    <div class="menu-buttons">
+        <h4>メニュー</h4>
+        <a class="menu-button" href="{{ url_for('room_create_view') }}"><i class="fas fa-plus"></i> ルーム作成</a>
+        <a class="menu-button" href="{{ url_for('room_search_view') }}"><i class="fas fa-search"></i> ジャンル検索</a>
+        <a class="menu-button" href="{{ url_for('profile_view') }}"><i class="fas fa-user"></i> プロフィール</a>
+    </div>
+    <div class="menu-footer">
+        <a class="logout-button" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> ログアウト</a>
+    </div>
   </div>
   <div class="room-container">
-<!-- ここにチャットルームを表示する -->
-    <h4>ルーム一覧</h4>
-    <a href="{{ url_for('chatroom_screen', room_id=1) }}">チャットルーム1</a><br>
+    <div class="room-header">
+      <h5>ルーム一覧</h5>
+    </div>
+    <div class="room-main">
+      {% if channels %}
+        <ul class="room-list">
+          {% for channel in channels %}
+            <li class="room-item">
+              <a class="room-link" href="{{ url_for('chatroom_screen', channel_id=channel.channel_id) }}">
+                <span>{{ channel.channel_name }}</span>
+              </a>
+              <a href="{{ url_for('delete_room', channel_id=channel.channel_id) }}">
+                <i class="fas fa-trash text-danger" title="ルーム削除"></i>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>チャンネルが存在しません</p>
+      {% endif %}
+    </div>
   </div>
 </div>
 {% endblock %}
