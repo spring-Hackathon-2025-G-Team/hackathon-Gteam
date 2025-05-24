@@ -7,48 +7,58 @@
 {% block content %}
 <div class="wrapper">
   <div class="menu-container">
-    <h3>偏愛会議</h3>
-    <h4>メニュー</h4>
-    <a class="menu-button" href="{{ url_for('index_view') }}">ルーム一覧</a><br>
-    <a class="logout-button" href="{{ url_for('logout') }}">ログアウト</a>
+    <div class="menu-header">
+      <h3>偏愛会議</h3>
+    </div>
+    <div class="menu-buttons">
+      <h4>メニュー</h4>
+      <a class="menu-button" href="{{ url_for('index_view') }}"><i class="fas fa-home"></i> ルーム一覧</a>
+    </div>
+    <div class="menu-footer">
+      <a class="logout-button" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i>ログアウト</a>
+    </div>
   </div>
   <div class="room-container">
-    <h4>ルーム作成</h4>
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <div class="flashes">
-        {% for message in messages %}
-          <p>{{ message }}</p>
-        {% endfor %}
-      </div>
-    {% endif %}
-    {% endwith %}
-    <form method="post" action="{{ url_for('room_create_process') }}">
-      <label for="text">ルーム名</label>
-      <input type="text" id="channel_name" name="channel_name" ><br><br>
-      <select name="hobby_genre_name" size="5">
-        <option value="travel">旅行</option>
-        <option value="eat">飲食</option>
-        <option value="art">芸術</option>
-        <option value="study">学習</option>
-        <option value="movie">映画</option>
-        <option value="comic">漫画・アニメ・ゲーム</option>
-        <option value="music">音楽</option>
-        <option value="idol">アイドル</option>
-        <option value="musle">筋トレ</option>
-        <option value="sports">スポーツ</option>
-        <option value="sauna">サウナ</option>
-        <option value="relax">リラックス</option>
-        <option value="fashion">ファッション</option>
-        <option value="cosme">コスメ</option>
-        <option value="pet">ペット</option>
-        <option value="another">その他</option>
-        </select>
-        <br><br><br>
-      <label for="text">コメント</label>
-      <input type="text" id="comment" name="comment" ><br><br>
-      <button>作成</button>
-    </form>
+    <div class="room-header">
+      <h5>ルーム作成</h5>
+    </div>
+    <div class="room-main">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="flashes">
+          {% for message in messages %}
+            <p>{{ message }}</p>
+          {% endfor %}
+        </div>
+        {% endif %}
+      {% endwith %}
+      <form method="post" action="{{ url_for('room_create_process') }}">
+        <label for="text">ルーム名</label>
+        <input type="text" id="channel_name" name="channel_name" ><br><br>
+        <select name="hobby_genre_name" size="5">
+          <option value="travel">旅行</option>
+          <option value="eat">飲食</option>
+          <option value="art">芸術</option>
+          <option value="study">学習</option>
+          <option value="movie">映画</option>
+          <option value="comic">漫画・アニメ・ゲーム</option>
+          <option value="music">音楽</option>
+          <option value="idol">アイドル</option>
+          <option value="musle">筋トレ</option>
+          <option value="sports">スポーツ</option>
+          <option value="sauna">サウナ</option>
+          <option value="relax">リラックス</option>
+          <option value="fashion">ファッション</option>
+          <option value="cosme">コスメ</option>
+          <option value="pet">ペット</option>
+          <option value="another">その他</option>
+          </select>
+          <br><br><br>
+        <label for="text">コメント</label>
+        <input type="text" id="comment" name="comment" ><br><br>
+        <button>作成</button>
+      </form>
+    </div>
   </div>
 </div>   
 {% endblock %}

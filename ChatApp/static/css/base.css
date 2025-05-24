@@ -29,7 +29,111 @@ input {
   /* text-align: center; */
 }
 
+/* 入力欄の文字 */
 ::placeholder {
   color: #912018;
   font-family: 'Noto Sans JP', sans-serif;
+}
+
+
+
+.wrapper {
+  margin: 0;
+  display: flex; /* 親要素に指定、子要素はmenu-container・room-container */
+  height: 100vh;
+}
+
+.menu-container {
+  width: 25%;
+  height: 100vh;
+  background-color: #FEF3F2;
+  display: flex; /* 親要素に指定、子要素はmenu-header・menu-buttons・menu-footer */
+  flex-direction: column; /* 要素の配置(縦横斜め): 縦方向（上から下）に並べる */
+  justify-content: space-between; /* 要素の配置:上中下に分ける */
+  text-align: center; /* 文字の配置(左・中央・右): 中央寄せ */
+  align-items: center;
+  overflow: hidden; /* はみ出し防止 */
+}
+
+.menu-header {
+  margin: 0;
+}
+
+.menu-buttons {
+  display: flex; /* 親要素に指定、子要素は h4 と aタグ3つ */
+  flex-direction: column;
+  align-items: center;
+  margin-top: -30vh;
+}
+
+.menu-footer {
+  margin-bottom: 7vh;
+}
+
+/* 偏愛会議の文字 */
+h3 {
+  font-family: 'M PLUS Rounded 1c', sans-serif; /* フォントの指定 */
+  font-size: 3vw; /* 画面の横幅に応じて変化する */
+  color: #912018;
+}
+
+/* メニューの文字 */
+h4 {
+  font-family: 'M PLUS Rounded 1c', sans-serif; /* フォントの指定 */
+  font-size: 2vw; /* 画面の横幅に応じて変化する */
+  color: #912018;
+  margin: 1vw;
+}
+
+
+/* メニューのaタグ */
+.menu-button {
+  display: inline-block;
+  width: 15vw; /* ボタンの幅 */
+  padding: 0.3vw ; /* ボタンの高さ */
+  font-size: 1.3vw;
+  margin: 0.6vw;
+  background-color: #FDA29B;
+  color: #FFFFFF; /* 文字の色 */
+  border: none; /* 要素の枠線: なし */
+  border-radius: 50px; /* ボタンの角丸 */
+  cursor: pointer; /* マウスポインターを登録ボタンに合わせると指差しアイコンに変わる */
+  text-decoration: none; /* 文字の下線:なし */
+}
+
+/* ログアウトボタン */
+.logout-button {
+  display: inline-block;
+  text-align: center;
+  width: 15vw; /* ボタンの幅 */
+  padding: 0.35vw ; /* ボタンの高さ */
+  margin: 1vw;
+  background-color: #D92D20;
+  color: #FFFFFF;
+  font-size: 1.2vw;
+  border: none; /* 要素の枠線: なし */
+  border-radius: 50px; /* ボタンの角丸 */
+  text-decoration: none; /* 文字の下線:なし */
+  cursor: pointer; /* マウスポインターを登録ボタンに合わせると指差しアイコンに変わる */
+}
+
+.room-container {
+  width: 75%;
+  height: 100vh;
+  background-color: #FFFFFF
+}
+
+/* メニュー */
+.room-header {
+  margin: 0;
+  background-color: #912018;
+  font-family: 'M PLUS Rounded 1c', sans-serif; /* フォントの指定 */
+  font-size: 2vw; /* 画面の横幅に応じて変化する */
+  color: #FFFFFF;
+  text-indent: 1em;
+}
+
+.room-header h5 {
+  margin: 0;
+  padding: 0.5vw;
 }
