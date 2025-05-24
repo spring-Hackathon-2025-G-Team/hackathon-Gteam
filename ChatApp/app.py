@@ -123,6 +123,8 @@ def password_reset_process():
         flash('空欄を埋めてください')
     elif new_password != new_password_second:
         flash('パスワードが一致しません')
+    elif len(new_password) < 8 or len(new_password) > 16:
+        flash('パスワードは8～16文字で入力してください')
     elif re.match(EMAIL_PATTERN, email) is None:
         flash('正しいメールアドレスの形式で入力してください')
     else:
