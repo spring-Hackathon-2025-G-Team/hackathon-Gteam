@@ -23,6 +23,17 @@
   <small>作成日時:{{ channel.created_at }}</small>
 {% endfor %}
   </div>
+  <div>
+    <h3>人気ルーム　ランキング</h3>
+    {% for i in genre_rank %}
+    <ul>
+      <li>
+        <h4>{{ loop.index }}位</h4>
+        <h5>ルーム名：{{ i[0]['channel_name'] }}</h5>
+      </li>
+    </ul>
+    {% endfor %}  
+  </div>
 </div>
 
 {% endblock %}

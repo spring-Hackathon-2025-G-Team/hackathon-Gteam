@@ -5,8 +5,9 @@ import uuid
 import re
 import os
 from flask_login import login_user, logout_user, login_required, LoginManager
+from flask_paginate import Pagination, get_page_parameter
 
-from models import User, Login, Genre, Search
+from models import User, Login, Genre, Search, Rank
 
 
 
@@ -14,6 +15,7 @@ from models import User, Login, Genre, Search
 
 # 定数定義
 EMAIL_PATTERN = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+PASSWORDS_PATTERN = r"^.{8,16}$"
 SESSION_DAYS = 30
 
 app = Flask(__name__)
@@ -52,6 +54,8 @@ def signup_process():
         flash('二つのパスワードの値が間違っています')
     elif re.match(EMAIL_PATTERN, email) is None:
         flash('正しいメールアドレスの形式ではありません')
+    elif re.match(PASSWORDS_PATTERN, password) is None:
+        flash("パスワードは8文字以上16文字以内で入力してください。")
     else:
        user_id = uuid.uuid4() 
        password = hashlib.sha256(password.encode('utf-8')).hexdigest()
@@ -149,6 +153,7 @@ def index_view():
 @app.route('/room_create', methods=['GET'])
 @login_required
 def room_create_view():
+
     return render_template('room_create.html')
 
 
@@ -228,22 +233,34 @@ def room_search_process():
             flash("該当するルームがまだありません")
             return render_template('room_search.html')
         else:
-            return render_template('room_search_result.html', channels = channels, genre =genre , content_type='text/html; charset=utf-8')
+             channel_id = Rank.ranking_all()
+             genre_rank = Rank.channel_name_find(channel_id)
+             return render_template('room_search_result.html', 
+                                    channels = channels, 
+                                    genre =genre , 
+                                    content_type='text/html; charset=utf-8', 
+                                    genre_rank = genre_rank)
 
     else:
-        channels = Search.find_by_search(search_genre_name)
-        if channels == ():
-            flash("該当するルームがまだありません")
-            return render_template('room_search.html')
-        else: 
-            return render_template('room_search_result.html', channels = channels, genre = genre , content_type='text/html; charset=utf-8')
+            channels = Search.find_by_search(search_genre_name)
+            if channels == ():
+                flash("該当するルームがまだありません")
+                return render_template('room_search.html')
+            else: 
+                rank_genre_id_dic = Rank.rank_serch_id(search_genre_name)
+                channel_id = Rank.ranking(rank_genre_id_dic)
+                genre_rank = Rank.channel_name_find(channel_id)
+                return render_template('room_search_result.html', 
+                                        channels = channels, 
+                                        genre =genre , 
+                                        content_type='text/html; charset=utf-8', 
+                                       genre_rank = genre_rank)
 
 # ジャンル検索結果画面の表示
 @app.route('/room_search_result', methods=['GET'])
 @login_required
 def room_search_result():
     genre = request.args.get('genre')
-    # ジャンル検索の処理
     return render_template('room_search_result.html', genre=genre)
 
 
