@@ -1,23 +1,9 @@
-from flask import session
 from flask_login import UserMixin, LoginManager
 from util.DB import DB
 
 
 db_use = DB.init_pool()
 
-
-
-# class Pagenation:
-#     @classmethod
-#     def index_get_all():
-#          conn = db_use.get_conn()
-#          try:
-#             with conn.cursor() as cursor:
-#                 sql = "INSERT INTO users (user_id, email, password, nickname) VALUES (%s, %s, %s, %s)"
-#                 cursor.execute(sql, (user_id, email, password, nickname))
-#                 conn.commit()
-#             finally:
-#               db_use.release(conn)
                
 
 
