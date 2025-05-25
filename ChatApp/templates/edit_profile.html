@@ -7,17 +7,27 @@
 {% block content %}
 <div class="wrapper">
   <div class="menu-container">
-    <h3>偏愛会議</h3>
-    <h4>メニュー</h4>
-    <a class="menu-button" href="{{ url_for('profile_view') }}">プロフィール</a><br>
-    <a class="logout-button" href="{{ url_for('logout') }}">ログアウト</a>
+    <div class="menu-header">
+      <h3>偏愛会議</h3>
+    </div>
+    <div class="menu-buttons">
+      <h4>メニュー</h4>
+      <a class="menu-button" href="{{ url_for('profile_view') }}"><i class="fas fa-user"></i> プロフィール</a>
+    </div>
+    <div class="menu-footer">
+      <a class="logout-button" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> ログアウト</a>
+    </div>
   </div>
   <div class="room-container">
-    <h4>プロフィール編集</h4>
-    <form method="POST" action="{{ url_for('edit_profile_view') }}">
-      <!-- 編集用の入力フォーム -->
-      <button type="submit">登録</button>
-    </form>
+    <div class="room-header">
+      <h5>プロフィール編集</h5>
+    </div>
+    <div class="room-main">
+      <form method="POST" action="{{ url_for('edit_profile_view') }}">
+        <!-- 編集用の入力フォーム -->
+        <button type="submit">登録</button>
+      </form>
+    </div>
   </div>
 </div>
 {% endblock %}

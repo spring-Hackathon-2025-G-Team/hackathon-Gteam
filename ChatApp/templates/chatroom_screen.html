@@ -7,16 +7,65 @@
 {% block content %}
 <div class="wrapper">
   <div class="menu-container">
-    <h3>偏愛会議</h3>
-    <h4>メニュー</h4>
-    <a class="menu-button" href="{{ url_for('index_view') }}">ルーム一覧</a><br>
-    <a class="logout-button" href="{{ url_for('logout') }}">ログアウト</a>
+    <div class="menu-header">
+      <h3>偏愛会議</h3>
+    </div>
+    <div class="menu-buttons">
+      <h4>メニュー</h4>
+      <a class="menu-button" href="{{ url_for('index_view') }}"><i class="fas fa-home"></i> ルーム一覧</a><br>
+    </div>
+    <div class="menu-footer">
+      <a class="logout-button" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> ログアウト</a>
+    </div>
   </div>
   <div class="room-container">
-    <h4>チャットルーム</h4>
-    <div class="room-container">
+    <div class="room-header">
+      <h5>{{ channel_name }}のチャットルーム</h5>
+    </div>
+    <div class="room-main">
       <!-- ここにチャット画面のやり取りを表示させる -->
+
+
+      <!-- 以下テスト用に追加 -->
+      <div class="chat-box">
+        <!-- チャット投稿フォーム -->
+        <form action="{{ url_for('send_message', channel_id=channel_id) }}" method="POST">
+          <textarea name="message" rows="2" cols="50" placeholder="メッセージを入力"></textarea>
+          <button type="submit">送信</button>
+        </form>
+
+        <hr>
+
+        <!-- チャットメッセージ表示と編集/削除 -->
+        {% for message in messages %}
+        <div class="message-block">
+          <p>
+            <img src="{{ message.icon_image_url }}" width="30" height="30" style="border-radius:50%; vertical-align: middle;">
+            <strong>{{ message.nickname }}</strong>: {{ message.message_content }}
+          </p>
+
+          {% if message.user_id == user_id %}
+          <!-- 編集フォーム -->
+          <form action="{{ url_for('update_message', channel_id=channel_id, message_id=message.message_id) }}" method="POST"
+            style="display:inline; margin-right: 5px;">
+            <input type="text" name="message" value="{{ message.message_content }}" placeholder="新しい内容">
+            <button type="submit">編集</button>
+          </form>
+
+          <!-- 削除フォーム -->
+          <form action="{{ url_for('delete_message', channel_id=channel_id, message_id=message.message_id) }}" method="POST"
+            style="display:inline;">
+            <button type="submit" onclick="return confirm('本当に削除しますか？')">削除</button>
+          </form>
+          {% endif %}
+        </div>
+        <hr>
+        {% endfor %}
+      </div>
     </div>
   </div>
 </div>
+
+
+
 {% endblock %}
