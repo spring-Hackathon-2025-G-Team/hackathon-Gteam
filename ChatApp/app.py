@@ -319,8 +319,6 @@ def edit_profile_view():
     return render_template('edit_profile.html', user_id=user_id)
 
 
-
-
 if __name__ == '__main__':
     print("Starting Flask application...")
     app.run(host='0.0.0.0', debug=True)
