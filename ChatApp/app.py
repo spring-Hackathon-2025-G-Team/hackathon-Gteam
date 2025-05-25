@@ -289,6 +289,7 @@ def profile_view():
 
 
 # プロフィール編集画面の表示
+
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile_view():
