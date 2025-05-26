@@ -227,13 +227,13 @@ def room_create_process():
             Genre.create_comment(channel_id, channel_name, channel_comment, user_id , hobby_genre_id)
     return redirect(url_for('index_view'))
 
-# ジャンル検索画面の表示
+# ジャンル検索画面の表示、ランキング表示画面ランキング表示画面表示
 @app.route('/room_search')
 @login_required
 def room_search_view():
     return render_template('room_search.html')
 
-#ジャンル検索画面
+#ジャンル検索画面,ランキング表示画面
 @app.route('/room_search', methods=['POST'])
 @login_required
 def room_search_process():
