@@ -33,7 +33,30 @@ class User:
                 return user
           finally:
                 db_use.release(conn)
-                        
+
+     @classmethod
+     def update_password(cls, user_id, new_hashpassword):
+          conn = db_use.get_conn()
+          try:
+            with conn.cursor() as cursor:
+                sql = "UPDATE users SET password = %s WHERE user_id = %s"
+                cursor.execute(sql,(new_hashpassword, user_id))
+                conn.commit()
+          finally:
+              db_use.release(conn)
+
+
+     @classmethod
+     def update_profile(cls, user_id, nickname, icon_image_url, favorite, bio):
+         conn = db_use.get_conn()
+         try:
+            with conn.cursor() as cursor:
+                sql = "UPDATE users SET nickname = %s, icon_image_url = %s, favorite = %s, bio = %s WHERE user_id = %s"
+                cursor.execute(sql, (nickname, icon_image_url, favorite, bio, user_id))
+                conn.commit()
+         finally:
+             db_use.release(conn)
+
 
 class Login(UserMixin):
     def __init__(self, user_id):
