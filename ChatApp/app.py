@@ -123,6 +123,8 @@ def password_reset_process():
         flash('空欄を埋めてください')
     elif new_password != new_password_second:
         flash('パスワードが一致しません')
+    elif len(new_password) < 8 or len(new_password) > 16:
+        flash('パスワードは8～16文字で入力してください')
     elif re.match(EMAIL_PATTERN, email) is None:
         flash('正しいメールアドレスの形式で入力してください')
     else:
@@ -277,8 +279,8 @@ def room_search_result():
     # ジャンル検索の処理
     return render_template('room_search_result.html', genre=genre)
 
-
 # プロフィール画面の表示
+
 @app.route('/profile')
 @login_required
 def profile_view():
@@ -287,15 +289,34 @@ def profile_view():
 
 
 # プロフィール編集画面の表示
+
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile_view():
     user_id = session.get('user_id') 
+
+    if not user_id:
+            flash('ログインしてください')
+            return redirect(url_for('login_view'))
+
     if request.method == 'POST':
-        # 処理
+        nickname = request.form.get('nickname')
+        icon_image_url = request.form.get('icon_image_url')
+        favorite = request.form.get('favorite')
+        bio = request.form.get('bio')
+
+        if not favorite:
+            flash('趣味を入力してください')
+            return redirect(url_for('edit_profile_view'))
+        
+        elif len(bio) > 200:
+            flash('ひとことコメントは200字以内で入力してください')
+            return redirect(url_for('edit_profile_view'))
+        
+        User.update_profile(user_id, nickname, icon_image_url, favorite, bio)
+        flash('プロフィールを更新しました')
         return redirect(url_for('profile_view'))
     return render_template('edit_profile.html', user_id=user_id)
-
 
 
 
