@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, session, flash, abort, url_for
+from flask import Flask, request, redirect, render_template, session, flash, abort, url_for, current_user
 from datetime import timedelta
 import hashlib
 import uuid
@@ -281,23 +281,37 @@ def room_search_result():
 
 # プロフィール画面の表示
 
-@app.route('/profile')
+@app.route('/profile/<user_id>') 
 @login_required
-def profile_view():
-    user_id = session.get("user_id")
-    return render_template('profile.html', user_id=user_id)
+def profile_view(user_id): 
+    if str(user_id) != str(current_user.user_id): #他人が閲覧できないようにガード
+        abort(403)
+
+    user = User.get_user_by_id(user_id)
+    if not user:
+        flash('ユーザーが存在しません')
+        return redirect(url_for('edit_profile_view', user_id=current_user.user_id))
+    
+    return render_template('profile.html',  # profile.htmlにこれらのデータを渡す
+                           nickname=user['nickname'],
+                           icon_image_url=user['icon_image_url'],
+                           favorite=user['favorite'],
+                           bio=user['bio']
+                           )
 
 
 # プロフィール編集画面の表示
 
-@app.route('/edit_profile', methods=['GET', 'POST'])
+@app.route('/edit_profile/<user_id>', methods=['GET', 'POST'])
 @login_required
-def edit_profile_view():
-    user_id = session.get('user_id') 
+def edit_profile_view(user_id):
+    if str(user_id) != str(current_user.user_id):
+        abort(403)
 
-    if not user_id:
-            flash('ログインしてください')
-            return redirect(url_for('login_view'))
+    user = User.get_user_by_id(user_id)
+    if not user:
+            flash('ユーザーが存在しません')
+            return redirect(url_for('profile_view', user_id=current_user.user_id))
 
     if request.method == 'POST':
         nickname = request.form.get('nickname')
@@ -307,16 +321,22 @@ def edit_profile_view():
 
         if not favorite:
             flash('趣味を入力してください')
-            return redirect(url_for('edit_profile_view'))
+            return redirect(url_for('edit_profile_view', user_id=user_id))
         
         elif len(bio) > 200:
             flash('ひとことコメントは200字以内で入力してください')
-            return redirect(url_for('edit_profile_view'))
+            return redirect(url_for('edit_profile_view', user_id=user_id))
         
         User.update_profile(user_id, nickname, icon_image_url, favorite, bio)
         flash('プロフィールを更新しました')
-        return redirect(url_for('profile_view'))
-    return render_template('edit_profile.html', user_id=user_id)
+        return redirect(url_for('profile_view', user_id=user_id))
+    
+    return render_template('edit_profile.html', 
+                           nickname=user['nickname'],
+                           icon_image_url=user['icon_image_url'],
+                           favorite=user['favorite'],
+                           bio=user['bio']
+                           )
 
 
 if __name__ == '__main__':

@@ -17,8 +17,8 @@ class User:
           conn = db_use.get_conn()
           try:
             with conn.cursor() as cursor:
-                sql = "INSERT INTO users (user_id, email, password, nickname) VALUES (%s, %s, %s, %s)"
-                cursor.execute(sql, (user_id, email, password, nickname))
+                sql = "INSERT INTO users (user_id, email, password, nickname, icon_image_url, favorite, bio) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                cursor.execute(sql, (user_id, email, password, nickname, '/static/image/icon', '未登録', ''))
                 conn.commit()
           finally:
               db_use.release(conn)
@@ -47,17 +47,37 @@ class User:
           finally:
               db_use.release(conn)
 
-      
+     
      @classmethod
-     def update_profile(cls, user_id, nickname, icon_image_url, favorite, bio):
+     def get_user_by_id(cls, user_id):
          conn = db_use.get_conn()
          try:
-            with conn.cursor() as cursor:
-                sql = "UPDATE users SET nickname = %s, icon_image_url = %s, favorite = %s, bio = %s WHERE user_id = %s"
-                cursor.execute(sql, (nickname, icon_image_url, favorite, bio, user_id))
-                conn.commit()
+             with conn.cursor() as cursor:
+                 sql = "SELECT nickname, icon_image_url, favorite, bio FROM users WHERE user_id = %s"
+                 cursor.execute(sql, (user_id,))
+                 result = cursor.fetchone()
+                 if result is not None:
+                     if isinstance(result, dict):
+                         return{
+                             'nickname': result.get('nickname', ''),
+                             'icon_image_url': result.get('icon_image_url', ''),
+                             'favorite': result.get('favorite', ''),
+                             'bio': result.get('bio', '')
+                             }
+                     else:
+                         return {
+                             'nickname': result[0],
+                             'icon_image_url': result[1],
+                             'favorite': result[2],
+                             'bio': result[3]
+                         }
+                 return None
          finally:
-             db_use.release(conn)@classmethod
+             db_use.release(conn)
+ 
+
+
+     @classmethod
      def update_profile(cls, user_id, nickname, icon_image_url, favorite, bio):
          conn = db_use.get_conn()
          try:
