@@ -6,9 +6,7 @@ from util.DB import DB
 
 db_use = DB.init_pool()
 
-
-
-
+               
 
 
 class User:
@@ -214,6 +212,67 @@ class Search:
                 return  channels
           finally:
               db_use.release(conn)
+
+
+class  Rank:
+    @classmethod
+    def channel_name_find(cls,channel_id_dic):
+        channel_ids = [item['channel_id'] for item in channel_id_dic]
+        conn = db_use.get_conn()
+        try:
+            with conn.cursor() as cursor:
+                sql = "SELECT channel_name FROM channels WHERE channel_id=%s"
+                genre_rank_name=[]
+                for item in channel_ids:
+                    cursor.execute(sql, (item,))
+                    genre_rank_name.append(cursor.fetchall())  
+                conn.commit()
+                return  genre_rank_name
+        finally:
+              db_use.release(conn)
+
+    @classmethod
+    def ranking(cls, rank_genre_id):
+        conn = db_use.get_conn()
+        channel_id_list =[]
+        try:
+            with conn.cursor() as cursor:
+                sql = "SELECT m.channel_id,COUNT(DISTINCT CONCAT(m.user_id, '-', m.channel_id)) AS genre_count FROM messages m INNER JOIN  channels c ON m.channel_id = c.channel_id INNER JOIN hobby_genres h ON c.hobby_genre_id = h.hobby_genre_id  WHERE h.hobby_genre_id=%s   GROUP BY channel_id ORDER BY genre_count DESC LIMIT 3"
+                cursor.execute(sql,(rank_genre_id,))
+                channel_id_list = cursor.fetchall() 
+                conn.commit()
+                return  channel_id_list
+        finally:
+              db_use.release(conn)
+
+    @classmethod
+    def rank_serch_id(cls,name):
+         conn = db_use.get_conn()
+         try:
+            with conn.cursor() as cursor:
+                sql = "SELECT hobby_genre_id FROM hobby_genres WHERE hobby_genre_name =%s"
+                cursor.execute(sql, (name,))
+                channel_name = cursor.fetchone()
+                hobby_genre_name = channel_name["hobby_genre_id"]
+                conn.commit()
+                return hobby_genre_name
+         finally:
+              db_use.release(conn)
+
+
+    @classmethod
+    def ranking_all(cls):
+            conn = db_use.get_conn()
+            channel_id_list =[]
+            try:
+                with conn.cursor() as cursor:
+                    sql = "SELECT channel_id,COUNT(DISTINCT CONCAT(user_id, '-', channel_id))  FROM messages GROUP BY channel_id LIMIT 3"
+                    cursor.execute(sql)
+                    channel_id_list = cursor.fetchall() 
+                    conn.commit()
+                    return  channel_id_list
+            finally:
+                db_use.release(conn)
 
 # メッセージクラス（作成、削除、編集、全取得）
 class Message:
