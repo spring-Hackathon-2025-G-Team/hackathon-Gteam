@@ -4,7 +4,7 @@ import hashlib
 import uuid
 import re
 import os
-from flask_login import login_user, logout_user, login_required, LoginManager
+from flask_login import login_user, logout_user, login_required, LoginManager, current_user
 from flask_paginate import Pagination, get_page_parameter
 
 from models import User, Login, Genre, Search, Rank, Message
@@ -146,7 +146,7 @@ def password_reset_process():
 
 
 # チャットルーム一覧の表示
-@app.route('/index', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET'])
 @login_required
 def index_view():
     channels = Genre.get_all()
@@ -156,28 +156,25 @@ def index_view():
 @app.route('/chatroom_screen/<channel_id>', methods=['GET'])
 @login_required
 def chatroom_screen(channel_id):
-    user_id = session.get('user_id')
     messages = Message.get_all(channel_id)
-    return render_template('chatroom_screen.html', user_id=user_id, messages=messages, channel_id=channel_id)
+    return render_template('chatroom_screen.html', user_id=current_user.user_id, messages=messages, channel_id=channel_id)
 
 # チャット送信
 @app.route('/chatroom_screen/<channel_id>', methods=['POST'])
 @login_required
 def send_message(channel_id):
     message_content = request.form.get('message')
-    user_id = session.get('user_id')
     if message_content:
         message_id = str(uuid.uuid4())
-        Message.create(message_id, message_content, channel_id, user_id)
+        Message.create(message_id, message_content, channel_id, current_user.user_id)
     return redirect(url_for('chatroom_screen', channel_id = channel_id))
 
 # チャット削除
 @app.route('/chatroom_screen/<channel_id>/<message_id>/delete', methods=['POST'])
 @login_required
 def delete_message(channel_id, message_id):
-    user_id = session.get('user_id')
     if message_id:
-        Message.delete(message_id, user_id)
+        Message.delete(message_id, current_user.user_id)
     return redirect(url_for('chatroom_screen', channel_id = channel_id))
 
 # チャット編集
