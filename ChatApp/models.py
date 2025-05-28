@@ -328,7 +328,7 @@ class Message:
                 FROM messages
                 JOIN users ON messages.user_id = users.user_id
                 WHERE messages.channel_id=%s
-                ORDER BY created_at DESC
+                ORDER BY created_at ASC
                 """
                 cur.execute(sql, (channel_id,))
                 messages_list = cur.fetchall()
