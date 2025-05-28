@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, session, flash, abort, url_for, current_user
+from flask import Flask, request, redirect, render_template, session, flash, abort, url_for
 from datetime import timedelta
 import hashlib
 import uuid
