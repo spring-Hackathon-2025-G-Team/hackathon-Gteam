@@ -14,7 +14,7 @@
         <h4>メニュー</h4>
         <a class="menu-button" href="{{ url_for('room_create_view') }}"><i class="fas fa-plus"></i> ルーム作成</a>
         <a class="menu-button" href="{{ url_for('room_search_view') }}"><i class="fas fa-search"></i> ジャンル検索</a>
-        <a class="menu-button" href="{{ url_for('profile_view') }}"><i class="fas fa-user"></i> プロフィール</a>
+        <a class="menu-button" href="{{ url_for('profile_view', user_id=current_user.user_id) }}"><i class="fas fa-user"></i> プロフィール</a>
     </div>
     <div class="menu-footer">
         <a class="logout-button" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> ログアウト</a>
