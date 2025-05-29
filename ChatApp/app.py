@@ -66,7 +66,7 @@ def signup_process():
        else:
             User.create(user_id, email, password, nickname)
             UserId = str(user_id)
-            session['user_id'] = UserId
+            # session['user_id'] = UserId
             return redirect(url_for('login_view'))
     return redirect(url_for('signup_view'))
 
@@ -97,7 +97,7 @@ def login_process():
             else:
                 user_id = user['user_id']
                 login_user(Login(user_id))
-                session["user_id"] = user_id                
+                # session["user_id"] = user_id                
                 return redirect(url_for('index_view'))
     return redirect(url_for('login_view'))
 
@@ -107,7 +107,7 @@ def login_process():
 @login_required
 def logout():
     logout_user()
-    session.pop('user_id', None)
+    # session.pop('user_id', None)
     flash('ログアウトしました。')
     return redirect(url_for('login_view'))
 
@@ -146,7 +146,7 @@ def password_reset_process():
 
 
 # チャットルーム一覧の表示
-@app.route('/index', methods=['GET'])
+@app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index_view():
     channels = Genre.get_all()
@@ -156,25 +156,28 @@ def index_view():
 @app.route('/chatroom_screen/<channel_id>', methods=['GET'])
 @login_required
 def chatroom_screen(channel_id):
+    user_id = current_user.id
     messages = Message.get_all(channel_id)
-    return render_template('chatroom_screen.html', user_id=current_user.user_id, messages=messages, channel_id=channel_id)
+    return render_template('chatroom_screen.html', user_id=user_id, messages=messages, channel_id=channel_id)
 
 # チャット送信
 @app.route('/chatroom_screen/<channel_id>', methods=['POST'])
 @login_required
 def send_message(channel_id):
     message_content = request.form.get('message')
+    user_id = current_user.id
     if message_content:
         message_id = str(uuid.uuid4())
-        Message.create(message_id, message_content, channel_id, current_user.user_id)
+        Message.create(message_id, message_content, channel_id, user_id)
     return redirect(url_for('chatroom_screen', channel_id = channel_id))
 
 # チャット削除
 @app.route('/chatroom_screen/<channel_id>/<message_id>/delete', methods=['POST'])
 @login_required
 def delete_message(channel_id, message_id):
+    user_id = current_user.id
     if message_id:
-        Message.delete(message_id, current_user.user_id)
+        Message.delete(message_id, user_id)
     return redirect(url_for('chatroom_screen', channel_id = channel_id))
 
 # チャット編集
@@ -201,24 +204,26 @@ def room_create_process():
     channel_name = request.form.get('channel_name')
     hobby_genre_name = request.form.get('hobby_genre_name')
     channel_comment = request.form.get('comment')
-    if channel_name == '' or hobby_genre_name == '' :
+    if channel_name == '' or hobby_genre_name == None :
         flash('空のフォームがあるようです')
+        return redirect(url_for('room_create_view'))
 
     else:
-       registered_channel_name = Genre.find_by_channel_name(hobby_genre_name)
+       registered_channel_name = Genre.find_by_channel_name(channel_name)
        if registered_channel_name != None:
-           flash('既に登録されているようです')
+           flash('同じルーム名がすでに登録されています。')
+           return redirect(url_for('room_create_view'))
        else:
            if channel_comment == "":
             channel_id = uuid.uuid4() 
-            user_id = session["user_id"]
+            user_id = current_user.user_id
             genre_id_dic = Genre.find_by_genre_id(hobby_genre_name)
             hobby_genre_id = genre_id_dic["hobby_genre_id"]
             Genre.create(channel_id, channel_name, user_id , hobby_genre_id)
             return redirect(url_for('room_create_view'))
            else:
             channel_id = uuid.uuid4() 
-            user_id = session["user_id"]
+            user_id = current_user.user_id
             genre_id_dic = Genre.find_by_genre_id(hobby_genre_name)
             hobby_genre_id = genre_id_dic["hobby_genre_id"]
             Genre.create_comment(channel_id, channel_name, channel_comment, user_id , hobby_genre_id)

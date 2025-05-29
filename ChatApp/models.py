@@ -104,11 +104,6 @@ class Login(UserMixin):
         finally:
             db_use.release(conn)
 
-    def get_id(self):
-        return str(self.user_id)
-
-   
-
 class Genre:
     @classmethod
     def create(cls, channel_id, channel_name, user_id , hobby_genre_id):
