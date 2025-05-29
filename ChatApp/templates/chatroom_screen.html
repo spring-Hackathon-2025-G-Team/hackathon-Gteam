@@ -41,7 +41,7 @@
         <div class="message-block">
           <p>
             <img src="{{ message.icon_image_url }}" width="30" height="30" style="border-radius:50%; vertical-align: middle;">
-            <strong>{{ message.nickname }}</strong>: {{ message.message_content }}
+            <strong>{{ message.nickname }}</strong>: {{ message.message_content }} {{message.created_at}}
           </p>
 
           {% if message.user_id == user_id %}

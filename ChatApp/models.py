@@ -9,14 +9,14 @@ db_use = DB.init_pool()
                
 
 
-class User():
+class User:
      @classmethod
      def create(cls, user_id, email, password, nickname):
           conn = db_use.get_conn()
           try:
             with conn.cursor() as cursor:
-                sql = "INSERT INTO users (user_id, email, password, nickname) VALUES (%s, %s, %s, %s)"
-                cursor.execute(sql, (user_id, email, password, nickname))
+                sql = "INSERT INTO users (user_id, email, password, nickname, icon_image_url, favorite, bio) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                cursor.execute(sql, (user_id, email, password, nickname, '/static/image/icon', '未登録', ''))
                 conn.commit()
           finally:
               db_use.release(conn)
@@ -34,7 +34,6 @@ class User():
           finally:
                 db_use.release(conn)
 
-
      @classmethod
      def update_password(cls, user_id, new_hashpassword):
           conn = db_use.get_conn()
@@ -45,6 +44,35 @@ class User():
                 conn.commit()
           finally:
               db_use.release(conn)
+
+     
+     @classmethod
+     def get_user_by_id(cls, user_id):
+         conn = db_use.get_conn()
+         try:
+             with conn.cursor() as cursor:
+                 sql = "SELECT nickname, icon_image_url, favorite, bio FROM users WHERE user_id = %s"
+                 cursor.execute(sql, (user_id,))
+                 result = cursor.fetchone()
+                 if result is not None:
+                     if isinstance(result, dict):
+                         return{
+                             'nickname': result.get('nickname', ''),
+                             'icon_image_url': result.get('icon_image_url', ''),
+                             'favorite': result.get('favorite', ''),
+                             'bio': result.get('bio', '')
+                             }
+                     else:
+                         return {
+                             'nickname': result[0],
+                             'icon_image_url': result[1],
+                             'favorite': result[2],
+                             'bio': result[3]
+                         }
+                 return None
+         finally:
+             db_use.release(conn)
+ 
 
 
      @classmethod
@@ -61,22 +89,20 @@ class User():
 
 class Login(UserMixin):
     def __init__(self, user_id):
-       self.id = user_id
-    #    self.user_id= str(user_id)
-   
-
-    @classmethod
-    def get_users(cls, user_id):
-          conn = db_use.get_conn()
-          try:
+        self.user_id = user_id
+        conn = db_use.get_conn()
+        try:
             with conn.cursor() as cursor:
-                sql = "SELECT user_id from users WHERE user_id=%s"
-                cursor.execute(sql, (user_id))
-                user_id = cursor.fetchone()
-                conn.commit()
-                return  user_id
-          finally:
-              db_use.release(conn)
+                sql = "SELECT * FROM users WHERE user_id = %s"
+                cursor.execute(sql, (user_id,))
+                user = cursor.fetchone()
+
+                if user:
+                    self.email = user['email']
+                else:
+                    self.email = None
+        finally:
+            db_use.release(conn)
 
 class Genre:
     @classmethod
@@ -209,7 +235,6 @@ class  Rank:
                 sql = "SELECT m.channel_id,COUNT(DISTINCT CONCAT(m.user_id, '-', m.channel_id)) AS genre_count FROM messages m INNER JOIN  channels c ON m.channel_id = c.channel_id INNER JOIN hobby_genres h ON c.hobby_genre_id = h.hobby_genre_id  WHERE h.hobby_genre_id=%s   GROUP BY channel_id ORDER BY genre_count DESC LIMIT 3"
                 cursor.execute(sql,(rank_genre_id,))
                 channel_id_list = cursor.fetchall() 
-                print(channel_id_list)
                 conn.commit()
                 return  channel_id_list
         finally:
@@ -298,7 +323,7 @@ class Message:
                 FROM messages
                 JOIN users ON messages.user_id = users.user_id
                 WHERE messages.channel_id=%s
-                ORDER BY created_at DESC
+                ORDER BY created_at ASC
                 """
                 cur.execute(sql, (channel_id,))
                 messages_list = cur.fetchall()

@@ -29,10 +29,7 @@ login_manager.login_view = 'login_view'
 login_manager.login_message = "ログインが必要です。先にログインしてください。"
 @login_manager.user_loader
 def load_user(user_id):
-    current_user = Login.get_users(user_id)
-    if current_user :
-        return  Login(current_user["user_id"])
-
+    return  Login(user_id)
 
 ##ログインしている時だけは入れるページにはこれを書いてください--->@login_required
 
@@ -99,9 +96,8 @@ def login_process():
                 flash('パスワードが間違っています')
             else:
                 user_id = user['user_id']
-                user_dic = Login.get_users(user_id)
-                user_instans = Login(**user_dic)
-                login_user(user_instans)               
+                login_user(Login(user_id))
+                # session["user_id"] = user_id                
                 return redirect(url_for('index_view'))
     return redirect(url_for('login_view'))
 
@@ -211,21 +207,23 @@ def room_create_process():
     if channel_name == '' or hobby_genre_name == None :
         flash('空のフォームがあるようです')
         return redirect(url_for('room_create_view'))
+
     else:
        registered_channel_name = Genre.find_by_channel_name(channel_name)
        if registered_channel_name != None:
-           flash('既に登録されているようです')
+           flash('同じルーム名がすでに登録されています。')
            return redirect(url_for('room_create_view'))
        else:
            if channel_comment == "":
             channel_id = uuid.uuid4() 
-            user_id = current_user.id
+            user_id = current_user.user_id
             genre_id_dic = Genre.find_by_genre_id(hobby_genre_name)
             hobby_genre_id = genre_id_dic["hobby_genre_id"]
             Genre.create(channel_id, channel_name, user_id , hobby_genre_id)
+            return redirect(url_for('room_create_view'))
            else:
             channel_id = uuid.uuid4() 
-            user_id = current_user.id
+            user_id = current_user.user_id
             genre_id_dic = Genre.find_by_genre_id(hobby_genre_name)
             hobby_genre_id = genre_id_dic["hobby_genre_id"]
             Genre.create_comment(channel_id, channel_name, channel_comment, user_id , hobby_genre_id)
@@ -303,23 +301,37 @@ def room_search_result():
 
 # プロフィール画面の表示
 
-@app.route('/profile')
+@app.route('/profile/<user_id>') 
 @login_required
-def profile_view():
-    user_id = current_user.id
-    return render_template('profile.html', user_id=user_id)
+def profile_view(user_id): 
+    if str(user_id) != str(current_user.user_id): #他人が閲覧できないようにガード
+        abort(403)
+
+    user = User.get_user_by_id(user_id)
+    if not user:
+        flash('ユーザーが存在しません')
+        return redirect(url_for('edit_profile_view', user_id=current_user.user_id))
+    
+    return render_template('profile.html',  # profile.htmlにこれらのデータを渡す
+                           nickname=user['nickname'],
+                           icon_image_url=user['icon_image_url'],
+                           favorite=user['favorite'],
+                           bio=user['bio']
+                           )
 
 
 # プロフィール編集画面の表示
 
-@app.route('/edit_profile', methods=['GET', 'POST'])
+@app.route('/edit_profile/<user_id>', methods=['GET', 'POST'])
 @login_required
-def edit_profile_view():
-    user_id = current_user.id
+def edit_profile_view(user_id):
+    if str(user_id) != str(current_user.user_id):
+        abort(403)
 
-    if not user_id:
-            flash('ログインしてください')
-            return redirect(url_for('login_view'))
+    user = User.get_user_by_id(user_id)
+    if not user:
+            flash('ユーザーが存在しません')
+            return redirect(url_for('profile_view', user_id=current_user.user_id))
 
     if request.method == 'POST':
         nickname = request.form.get('nickname')
@@ -329,18 +341,22 @@ def edit_profile_view():
 
         if not favorite:
             flash('趣味を入力してください')
-            return redirect(url_for('edit_profile_view'))
+            return redirect(url_for('edit_profile_view', user_id=user_id))
         
         elif len(bio) > 200:
             flash('ひとことコメントは200字以内で入力してください')
-            return redirect(url_for('edit_profile_view'))
+            return redirect(url_for('edit_profile_view', user_id=user_id))
         
         User.update_profile(user_id, nickname, icon_image_url, favorite, bio)
         flash('プロフィールを更新しました')
-        return redirect(url_for('profile_view'))
-    return render_template('edit_profile.html', user_id=user_id)
-
-
+        return redirect(url_for('profile_view', user_id=user_id))
+    
+    return render_template('edit_profile.html', 
+                           nickname=user['nickname'],
+                           icon_image_url=user['icon_image_url'],
+                           favorite=user['favorite'],
+                           bio=user['bio']
+                           )
 
 
 if __name__ == '__main__':
