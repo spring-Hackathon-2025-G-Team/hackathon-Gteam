@@ -9,7 +9,7 @@ db_use = DB.init_pool()
                
 
 
-class User:
+class User():
      @classmethod
      def create(cls, user_id, email, password, nickname):
           conn = db_use.get_conn()
@@ -33,6 +33,7 @@ class User:
                 return user
           finally:
                 db_use.release(conn)
+
 
      @classmethod
      def update_password(cls, user_id, new_hashpassword):
@@ -60,25 +61,22 @@ class User:
 
 class Login(UserMixin):
     def __init__(self, user_id):
-        self.user_id = user_id
-        conn = db_use.get_conn()
-        try:
-            with conn.cursor() as cursor:
-                sql = "SELECT * FROM users WHERE user_id = %s"
-                cursor.execute(sql, (user_id,))
-                user = cursor.fetchone()
-
-                if user:
-                    self.email = user['email']
-                else:
-                    self.email = None
-        finally:
-            db_use.release(conn)
-
-    def get_id(self):
-        return str(self.user_id)
-
+       self.id = user_id
+    #    self.user_id= str(user_id)
    
+
+    @classmethod
+    def get_users(cls, user_id):
+          conn = db_use.get_conn()
+          try:
+            with conn.cursor() as cursor:
+                sql = "SELECT user_id from users WHERE user_id=%s"
+                cursor.execute(sql, (user_id))
+                user_id = cursor.fetchone()
+                conn.commit()
+                return  user_id
+          finally:
+              db_use.release(conn)
 
 class Genre:
     @classmethod
@@ -211,6 +209,7 @@ class  Rank:
                 sql = "SELECT m.channel_id,COUNT(DISTINCT CONCAT(m.user_id, '-', m.channel_id)) AS genre_count FROM messages m INNER JOIN  channels c ON m.channel_id = c.channel_id INNER JOIN hobby_genres h ON c.hobby_genre_id = h.hobby_genre_id  WHERE h.hobby_genre_id=%s   GROUP BY channel_id ORDER BY genre_count DESC LIMIT 3"
                 cursor.execute(sql,(rank_genre_id,))
                 channel_id_list = cursor.fetchall() 
+                print(channel_id_list)
                 conn.commit()
                 return  channel_id_list
         finally:
