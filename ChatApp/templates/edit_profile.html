@@ -25,8 +25,48 @@
     <div class="room-main">
       <form method="POST" action="{{ url_for('edit_profile_view') }}">
         <!-- 編集用の入力フォーム -->
-        <button type="submit">登録</button>
+        <div class="form-group">
+          <label for="nickname">ニックネーム</label>
+          <input placeholder="必須項目です" type="text" id="nickname" name="nickname" value="{{ current_user.nickname }}" required/>
+        </div>
+        <hr>
+        <div class="form-group">
+          <label for="bio">コメント</label>
+          <textarea id="bio" name="bio" rows="3">{{ current_user.bio or '' }}</textarea>
+        </div>
+        <hr>
+        <div class="form-group">
+          <label for="favorite">趣味</label>
+          <textarea id="favorite" name="favorite" rows="2" placeholder="例：食べ歩き">{{ current_user.favorite or '' }}</textarea>
+        </div>
+        <hr>
+        <label class="icon-container">アイコン選択</label>
+        {% set icons = ['icon.jpg', 'balance_scale.png', 'basketball.png', 'bird.png', 'camera.png', 'candy.png', 'cherry_blossom.png', 'clover.png', 'gift.png', 'glasses.png', 'maple_leaf.png', 'music.png', 'notebook.png', 'sunflower.png', 'teddy_bear.png', 'whale.png'] %}
+        <div class="icon-grid">
+          {% for icon in icons %}
+          
+            <label class="icon-option">
+              <input type="radio" name="icon" value="{{ icon }}" 
+              {% if (current_user.icon_image_url is not defined and icon == 'icon.jpg') or current_user.icon_image_url == icon %}
+              checked
+              {% endif %}
+              >
+              <img class="profile-icon" width="100" height="100" src="{{ url_for('static', filename='image/' ~ icon) }}" alt="プロフィール画像">
+            </label>
+              <!-- <img src="{{ url_for('static', filename='image/' ~ icon) }}" alt="{{ icon }}">
+            </label> -->
+          {% endfor %}
+        </div>
+        <br>
+        <div class="button-container">
+          <button class="update-button" type="submit">登録</button>
+        </div>
       </form>
+      <div class="button-container">
+        <form method="POST" action="{{ url_for('delete_account_process') }}">
+          <button class="delete_button" type="submit">アカウント削除</button>
+        </form>
+      </div>
     </div>
   </div>
 </div>

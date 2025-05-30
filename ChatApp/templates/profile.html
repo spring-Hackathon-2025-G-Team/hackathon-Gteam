@@ -24,7 +24,21 @@
       <h5>プロフィール</h5>
     </div>
     <div class="room-main">
-      <p>プロフィールを表示する</p>
+      <div>
+        {% set icon_url = 'image/icon.jpg' %}
+        {% if current_user.icon_image_url and current_user.icon_image_url != 'icon.jpg' %}
+          {% set icon_url = current_user.icon_image_url %}
+        {% endif %}
+        <img class="profile-icon" width="100" height="100" src="{{ url_for('static', filename='image/icon.jpg') }}" alt="プロフィール画像">
+
+      
+        <p><strong>ニックネーム：</strong>{{ current_user.nickname }}</p>
+        {% if current_user.bio %}
+          <p><strong>コメント：</strong>{{ current_user.bio }}</p>
+        {% else %}
+          <p><strong>コメント：</strong>登録されていません</p>
+        {% endif %}
+      </div>
     </div>
   </div>
 </div>

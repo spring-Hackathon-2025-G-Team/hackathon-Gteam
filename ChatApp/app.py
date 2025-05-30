@@ -4,9 +4,11 @@ import hashlib
 import uuid
 import re
 import os
-from flask_login import login_user, logout_user, login_required, LoginManager
+from flask_login import login_user, logout_user, login_required, LoginManager, current_user
 
-from models import User, Login, Genre, Search, Message
+
+from models import User, Login, Genre, Search, Rank, Message
+
 
 
 
@@ -14,6 +16,7 @@ from models import User, Login, Genre, Search, Message
 
 # 定数定義
 EMAIL_PATTERN = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+PASSWORDS_PATTERN = r"^.{8,16}$"
 SESSION_DAYS = 30
 
 app = Flask(__name__)
@@ -52,6 +55,8 @@ def signup_process():
         flash('二つのパスワードの値が間違っています')
     elif re.match(EMAIL_PATTERN, email) is None:
         flash('正しいメールアドレスの形式ではありません')
+    elif re.match(PASSWORDS_PATTERN, password) is None:
+        flash("パスワードは8文字以上16文字以内で入力してください。")
     else:
        user_id = uuid.uuid4() 
        password = hashlib.sha256(password.encode('utf-8')).hexdigest()
@@ -123,6 +128,8 @@ def password_reset_process():
         flash('空欄を埋めてください')
     elif new_password != new_password_second:
         flash('パスワードが一致しません')
+    elif len(new_password) < 8 or len(new_password) > 16:
+        flash('パスワードは8～16文字で入力してください')
     elif re.match(EMAIL_PATTERN, email) is None:
         flash('正しいメールアドレスの形式で入力してください')
     else:
@@ -139,7 +146,7 @@ def password_reset_process():
 
 
 # チャットルーム一覧の表示
-@app.route('/index', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET'])
 @login_required
 def index_view():
     channels = Genre.get_all()
@@ -149,28 +156,25 @@ def index_view():
 @app.route('/chatroom_screen/<channel_id>', methods=['GET'])
 @login_required
 def chatroom_screen(channel_id):
-    user_id = session.get('user_id')
     messages = Message.get_all(channel_id)
-    return render_template('chatroom_screen.html', user_id=user_id, messages=messages, channel_id=channel_id)
+    return render_template('chatroom_screen.html', user_id=current_user.user_id, messages=messages, channel_id=channel_id)
 
 # チャット送信
 @app.route('/chatroom_screen/<channel_id>', methods=['POST'])
 @login_required
 def send_message(channel_id):
     message_content = request.form.get('message')
-    user_id = session.get('user_id')
     if message_content:
         message_id = str(uuid.uuid4())
-        Message.create(message_id, message_content, channel_id, user_id)
+        Message.create(message_id, message_content, channel_id, current_user.user_id)
     return redirect(url_for('chatroom_screen', channel_id = channel_id))
 
 # チャット削除
 @app.route('/chatroom_screen/<channel_id>/<message_id>/delete', methods=['POST'])
 @login_required
 def delete_message(channel_id, message_id):
-    user_id = session.get('user_id')
     if message_id:
-        Message.delete(message_id, user_id)
+        Message.delete(message_id, current_user.user_id)
     return redirect(url_for('chatroom_screen', channel_id = channel_id))
 
 # チャット編集
@@ -186,6 +190,7 @@ def update_message(channel_id, message_id):
 @app.route('/room_create', methods=['GET'])
 @login_required
 def room_create_view():
+
     return render_template('room_create.html')
 
 
@@ -219,13 +224,13 @@ def room_create_process():
             Genre.create_comment(channel_id, channel_name, channel_comment, user_id , hobby_genre_id)
     return redirect(url_for('index_view'))
 
-# ジャンル検索画面の表示
+# ジャンル検索画面の表示、ランキング表示画面ランキング表示画面表示
 @app.route('/room_search')
 @login_required
 def room_search_view():
     return render_template('room_search.html')
 
-#ジャンル検索画面
+#ジャンル検索画面,ランキング表示画面
 @app.route('/room_search', methods=['POST'])
 @login_required
 def room_search_process():
@@ -259,43 +264,87 @@ def room_search_process():
             flash("該当するルームがまだありません")
             return render_template('room_search.html')
         else:
-            return render_template('room_search_result.html', channels = channels, genre =genre , content_type='text/html; charset=utf-8')
+             channel_id = Rank.ranking_all()
+             genre_rank = Rank.channel_name_find(channel_id)
+             return render_template('room_search_result.html', 
+                                    channels = channels, 
+                                    genre =genre , 
+                                    content_type='text/html; charset=utf-8', 
+                                    genre_rank = genre_rank)
 
     else:
-        channels = Search.find_by_search(search_genre_name)
-        if channels == ():
-            flash("該当するルームがまだありません")
-            return render_template('room_search.html')
-        else: 
-            return render_template('room_search_result.html', channels = channels, genre = genre , content_type='text/html; charset=utf-8')
+            channels = Search.find_by_search(search_genre_name)
+            if channels == ():
+                flash("該当するルームがまだありません")
+                return render_template('room_search.html')
+            else: 
+                rank_genre_id_dic = Rank.rank_serch_id(search_genre_name)
+                channel_id = Rank.ranking(rank_genre_id_dic)
+                genre_rank = Rank.channel_name_find(channel_id)
+                return render_template('room_search_result.html', 
+                                        channels = channels, 
+                                        genre =genre , 
+                                        content_type='text/html; charset=utf-8', 
+                                       genre_rank = genre_rank)
 
 # ジャンル検索結果画面の表示
 @app.route('/room_search_result', methods=['GET'])
 @login_required
 def room_search_result():
     genre = request.args.get('genre')
-    # ジャンル検索の処理
     return render_template('room_search_result.html', genre=genre)
 
-
 # プロフィール画面の表示
+
 @app.route('/profile')
 @login_required
 def profile_view():
-    user_id = session.get("user_id")
+    user_id = current_user.user_id
     return render_template('profile.html', user_id=user_id)
+
+
+# アカウント削除
+@app.route('/delete_account', methods=['POST'])
+@login_required
+def delete_account_prcess():
+    user_id = current_user.user_id
+    User.delete(user_id)
+    logout_user()
+    session.pop('user_id', None)
+    flash('アカウントを削除しました。ご利用ありがとうございました。')
+    return redirect(url_for('signup_view'))
 
 
 # プロフィール編集画面の表示
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile_view():
-    user_id = session.get('user_id') 
+    user_id = current_user.user_id
+    print("nickname:", current_user.nickname)
+
+    if not user_id:
+            flash('ログインしてください')
+            return redirect(url_for('login_view'))
+
     if request.method == 'POST':
-        # 処理
+        nickname = request.form.get('nickname')
+        icon_image_url = request.form.get('icon')
+        favorite = request.form.get('favorite')
+        bio = request.form.get('bio')
+
+        if not favorite:
+            flash('趣味を入力してください')
+            return redirect(url_for('edit_profile_view'))
+        
+        elif len(bio) > 200:
+            flash('ひとことコメントは200字以内で入力してください')
+            return redirect(url_for('edit_profile_view'))
+        
+        User.update_profile(user_id, nickname, icon_image_url, favorite, bio)
+        login_user(current_user) 
+        flash('プロフィールを更新しました')
         return redirect(url_for('profile_view'))
     return render_template('edit_profile.html', user_id=user_id)
-
 
 
 

@@ -6,9 +6,7 @@ from util.DB import DB
 
 db_use = DB.init_pool()
 
-
-
-
+               
 
 
 class User:
@@ -35,7 +33,30 @@ class User:
                 return user
           finally:
                 db_use.release(conn)
-                        
+
+     @classmethod
+     def update_password(cls, user_id, new_hashpassword):
+          conn = db_use.get_conn()
+          try:
+            with conn.cursor() as cursor:
+                sql = "UPDATE users SET password = %s WHERE user_id = %s"
+                cursor.execute(sql,(new_hashpassword, user_id))
+                conn.commit()
+          finally:
+              db_use.release(conn)
+
+
+     @classmethod
+     def update_profile(cls, user_id, nickname, icon_image_url, favorite, bio):
+         conn = db_use.get_conn()
+         try:
+            with conn.cursor() as cursor:
+                sql = "UPDATE users SET nickname = %s, icon_image_url = %s, favorite = %s, bio = %s WHERE user_id = %s"
+                cursor.execute(sql, (nickname, icon_image_url, favorite, bio, user_id))
+                conn.commit()
+         finally:
+             db_use.release(conn)
+
 
 class Login(UserMixin):
     def __init__(self, user_id):
@@ -49,8 +70,16 @@ class Login(UserMixin):
 
                 if user:
                     self.email = user['email']
+                    self.nickname = user['nickname']
+                    self.icon_image_url = user['icon_image_url']
+                    self.favorite = user['favorite']
+                    self.bio = user['bio']
                 else:
                     self.email = None
+                    self.nickname = ""
+                    self.icon_image_url = ""
+                    self.favorite = ""
+                    self.bio = ""
         finally:
             db_use.release(conn)
 
@@ -163,6 +192,67 @@ class Search:
           finally:
               db_use.release(conn)
 
+
+class  Rank:
+    @classmethod
+    def channel_name_find(cls,channel_id_dic):
+        channel_ids = [item['channel_id'] for item in channel_id_dic]
+        conn = db_use.get_conn()
+        try:
+            with conn.cursor() as cursor:
+                sql = "SELECT channel_name FROM channels WHERE channel_id=%s"
+                genre_rank_name=[]
+                for item in channel_ids:
+                    cursor.execute(sql, (item,))
+                    genre_rank_name.append(cursor.fetchall())  
+                conn.commit()
+                return  genre_rank_name
+        finally:
+              db_use.release(conn)
+
+    @classmethod
+    def ranking(cls, rank_genre_id):
+        conn = db_use.get_conn()
+        channel_id_list =[]
+        try:
+            with conn.cursor() as cursor:
+                sql = "SELECT m.channel_id,COUNT(DISTINCT CONCAT(m.user_id, '-', m.channel_id)) AS genre_count FROM messages m INNER JOIN  channels c ON m.channel_id = c.channel_id INNER JOIN hobby_genres h ON c.hobby_genre_id = h.hobby_genre_id  WHERE h.hobby_genre_id=%s   GROUP BY channel_id ORDER BY genre_count DESC LIMIT 3"
+                cursor.execute(sql,(rank_genre_id,))
+                channel_id_list = cursor.fetchall() 
+                conn.commit()
+                return  channel_id_list
+        finally:
+              db_use.release(conn)
+
+    @classmethod
+    def rank_serch_id(cls,name):
+         conn = db_use.get_conn()
+         try:
+            with conn.cursor() as cursor:
+                sql = "SELECT hobby_genre_id FROM hobby_genres WHERE hobby_genre_name =%s"
+                cursor.execute(sql, (name,))
+                channel_name = cursor.fetchone()
+                hobby_genre_name = channel_name["hobby_genre_id"]
+                conn.commit()
+                return hobby_genre_name
+         finally:
+              db_use.release(conn)
+
+
+    @classmethod
+    def ranking_all(cls):
+            conn = db_use.get_conn()
+            channel_id_list =[]
+            try:
+                with conn.cursor() as cursor:
+                    sql = "SELECT channel_id,COUNT(DISTINCT CONCAT(user_id, '-', channel_id))  FROM messages GROUP BY channel_id LIMIT 3"
+                    cursor.execute(sql)
+                    channel_id_list = cursor.fetchall() 
+                    conn.commit()
+                    return  channel_id_list
+            finally:
+                db_use.release(conn)
+
 # メッセージクラス（作成、削除、編集、全取得）
 class Message:
     @classmethod
@@ -217,7 +307,7 @@ class Message:
                 FROM messages
                 JOIN users ON messages.user_id = users.user_id
                 WHERE messages.channel_id=%s
-                ORDER BY created_at DESC
+                ORDER BY created_at ASC
                 """
                 cur.execute(sql, (channel_id,))
                 messages_list = cur.fetchall()
