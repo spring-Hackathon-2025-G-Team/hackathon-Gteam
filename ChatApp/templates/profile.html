@@ -30,10 +30,16 @@
           {% set icon_url = current_user.icon_image_url %}
         {% endif %}
         <img class="profile-icon" width="100" height="100" src="{{ url_for('static', filename='image/icon.jpg') }}" alt="プロフィール画像">
-
       
         <p><strong>ニックネーム：</strong>{{ current_user.nickname }}</p>
-        {% if current_user.bio %}
+
+        {% if current_user.favorite %}
+          <p><strong>趣味：</strong>{{ current_user.favorite }}</p>
+        {% else %}
+          <p><strong>コメント：</strong>登録されていません</p>
+        {% endif %}
+
+         {% if current_user.bio %}
           <p><strong>コメント：</strong>{{ current_user.bio }}</p>
         {% else %}
           <p><strong>コメント：</strong>登録されていません</p>

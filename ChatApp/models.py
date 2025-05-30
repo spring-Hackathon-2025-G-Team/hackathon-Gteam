@@ -56,6 +56,17 @@ class User:
                 conn.commit()
          finally:
              db_use.release(conn)
+    
+     @classmethod
+     def delete(cls, user_id):
+         conn = db_use.get_conn()
+         try:
+             with conn.cursor() as cursor:
+                 sql = "DELETE FROM users WHERE user_id = %s"
+                 cursor.execute(sql, (user_id,))
+                 conn.commit()
+         finally:
+             db_use.release(conn)
 
 
 class Login(UserMixin):

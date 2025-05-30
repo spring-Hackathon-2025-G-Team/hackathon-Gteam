@@ -224,6 +224,25 @@ def room_create_process():
             Genre.create_comment(channel_id, channel_name, channel_comment, user_id , hobby_genre_id)
     return redirect(url_for('index_view'))
 
+# チャット部屋の削除
+@app.route('/chatroom_screen/<channel_id>/delete_room', methods=['POST'])
+@login_required
+def delete_room(channel_id):
+    channel = Genre.find_by_channel_id(channel_id)
+    if channel is None:
+        flash('指定されたチャットルームが存在しません')
+        return redirect(url_for('index_view'))
+
+    if channel['user_id'] != current_user.user_id:
+        flash('このチャットルームは削除出来ません')
+        return redirect(url_for('chatroom_screen', channel_id=channel_id))
+
+    # チャンネル削除処理（関連するメッセージ含めて）
+    Genre.delete(channel_id)
+    flash('チャットルームを削除しました')
+    return redirect(url_for('index_view'))
+
+
 # ジャンル検索画面の表示、ランキング表示画面ランキング表示画面表示
 @app.route('/room_search')
 @login_required
@@ -295,32 +314,17 @@ def room_search_result():
     return render_template('room_search_result.html', genre=genre)
 
 # プロフィール画面の表示
-
 @app.route('/profile')
 @login_required
 def profile_view():
     user_id = current_user.user_id
     return render_template('profile.html', user_id=user_id)
 
-
-# アカウント削除
-@app.route('/delete_account', methods=['POST'])
-@login_required
-def delete_account_prcess():
-    user_id = current_user.user_id
-    User.delete(user_id)
-    logout_user()
-    session.pop('user_id', None)
-    flash('アカウントを削除しました。ご利用ありがとうございました。')
-    return redirect(url_for('signup_view'))
-
-
 # プロフィール編集画面の表示
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile_view():
     user_id = current_user.user_id
-    print("nickname:", current_user.nickname)
 
     if not user_id:
             flash('ログインしてください')
@@ -332,21 +336,34 @@ def edit_profile_view():
         favorite = request.form.get('favorite')
         bio = request.form.get('bio')
 
+        if not nickname:
+            nickname = current_user.nickname # 入力欄が空なら今のニックネームを使う
+
         if not favorite:
             flash('趣味を入力してください')
             return redirect(url_for('edit_profile_view'))
         
-        elif len(bio) > 200:
+        if len(bio) > 200:
             flash('ひとことコメントは200字以内で入力してください')
             return redirect(url_for('edit_profile_view'))
         
-        User.update_profile(user_id, nickname, icon_image_url, favorite, bio)
+        User.update_profile(current_user.user_id, nickname, icon_image_url, favorite, bio)
         login_user(current_user) 
         flash('プロフィールを更新しました')
         return redirect(url_for('profile_view'))
     return render_template('edit_profile.html', user_id=user_id)
 
 
+# アカウント削除
+@app.route('/delete_account', methods=['POST'])
+@login_required
+def delete_account_process():
+    user_id = current_user.user_id
+    User.delete(user_id)
+    logout_user()
+    session.pop('user_id', None)
+    flash('アカウントを削除しました。ご利用ありがとうございました。')
+    return redirect(url_for('signup_view'))
 
 
 if __name__ == '__main__':
