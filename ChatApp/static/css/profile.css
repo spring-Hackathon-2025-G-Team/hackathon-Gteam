@@ -1,0 +1,28 @@
+/* static/css/profile.css */
+
+/* room-main内の全体調整 */
+.room-main {
+  padding: 20px;
+}
+
+/* プロフィールアイコンを中央に配置 */
+.room-main img.profile-icon {
+  display: block;
+  margin: 5% auto 5% auto;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* テキスト部分を左寄せ、やや内側に */
+.room-main p {
+  text-align: left;
+  padding-left: 20%;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+/* ラベル部分を少し目立たせる */
+.room-main p strong {
+  color: #912018;
+  margin-right: 4px;
+}
